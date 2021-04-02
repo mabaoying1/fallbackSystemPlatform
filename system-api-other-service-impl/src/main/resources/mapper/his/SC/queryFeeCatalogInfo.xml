@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+
+<mapper namespace="com.soft.api.mapper.his.SC.QueryFeeCatalogInfoMapper">
+
+    <select id="getFeeCatalog" parameterType="map" resultType="map">
+        SELECT GY_YLMl.fyxh,
+               GY_YLMl.fymc,
+               GY_YLMl.fydw,
+               GY_YLMl.fygb,
+               GY_YLMl.mzsy,
+               GY_YLMl.zysy,
+               GY_YLMX.fydj,
+               GY_YLMX.mlbm
+          FROM GY_YLMl
+          LEFT JOIN GY_YLMX ON GY_YLMX.FYXH = GY_YLML.FYXH
+         WHERE GY_YLMl.zfpb = 0
+         <if test="fygb != null and fygb != ''">
+             and fygb = #{fygb}
+         </if>
+         <if test="mzsy != null and mzsy != ''">
+            and mzsy = #{mzsy}
+         </if>
+         <if test="zysy != null and zysy != ''">
+            and zysy = #{zysy}
+         </if>
+         <if test="fymc != null and fymc != ''">
+            and fymc = #{fymc}
+         </if>
+    </select>
+
+</mapper>

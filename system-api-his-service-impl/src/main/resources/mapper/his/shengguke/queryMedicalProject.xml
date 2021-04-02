@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.his.shengguke.IQueryMedicalProjectMapper">
+    <select id="getMedicalProject" parameterType="map" resultType="map">
+        select
+        a.fyxh as itemcode,
+        fymc  as itemname,
+        fydw as itemunit,
+        fygb as itemtype,
+        c.sfmc as itemtypename,
+        a.pydm as item_spell,
+        xmbm as itempriceno,
+        fydj as itemprice,
+        ybyytx as itemmedinfo,
+        a.zfpb as itemcancel
+        from gy_ylml a ,gy_ylmx b ,gy_sfxm c
+        where a.fyxh =b.fyxh and a.fygb =c.sfxm and  a.zfpb = 0
+        <if test="itemcode != null and itemcode != '' ">
+            and a.fyxh = #{itemcode}
+        </if>
+        <if test="itemtype != null and itemtype != ''">
+            and fygb = #{itemtype}
+        </if>
+        <if test="itemname != null and itemname != ''">
+            and fymc like '%${itemname}%'
+        </if>
+    </select>
+</mapper>

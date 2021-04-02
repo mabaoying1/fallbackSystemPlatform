@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.his.shengguke.IOperationMapper">
+
+	<delete id="deleteSSJL" parameterType="map">
+		delete from sm_ssjl where ssbh = #{SSBH}
+	</delete>
+
+	<insert id="insertSSJLReCord" parameterType="java.util.Map">
+		insert into sm_ssjl (
+		ssbh,jgid,kssj,jssj,ssfj,zyh,
+		SSYS,SSYZ,SSEZ,SSSZ,XSHS,XSHS_2,
+		XHHS,XHHS_2)
+		values
+		(#{SSBH},1,to_date(#{KSSJ},'yyyy-mm-dd hh24:mi:ss'),to_date(#{JSSJ},'yyyy-mm-dd hh24:mi:ss'),#{SSFJ,jdbcType=VARCHAR},#{ZYH},
+		#{Operator},#{Assistant1,jdbcType=VARCHAR},#{Assistant2,jdbcType=VARCHAR},#{Assistant3,jdbcType=VARCHAR},#{InstrumentNurse1,jdbcType=VARCHAR},#{InstrumentNurse2,jdbcType=VARCHAR},
+		#{CirculatingNurse1,jdbcType=VARCHAR},#{CirculatingNurse2,jdbcType=VARCHAR})
+	</insert>
+
+	<update id="updateSSAPStateWcbz" parameterType="java.util.Map">
+		update SM_SSAP set SM_SSAP.WCBZ  = #{wcbz},
+			SM_SSAP.MZWCBZ = #{mzbz} where SM_SSAP.sqdh = #{RequestId}
+	</update>
+
+	<select id="queryOpertionWCjlByRequestId" parameterType="java.util.Map" resultType="java.util.HashMap">
+		select a.SSBH,a.ZYH,KSSJ,JSSJ from SM_SSJL a
+			inner join  SM_SSap b on a.ssbh=b.ssbh where ZFBZ=0 and b.sqdh = #{RequestId}
+	</select>
+
+	<select id="queryOpertionRecordByRequestId" parameterType="java.util.Map" resultType="java.util.HashMap">
+		select zyh as "zyh" ,ssbh as "ssbh" from SM_SSAP where SQDH = #{RequestId} and zfbz = 0
+	</select>
+
+	<update id="updateSSAPState" parameterType="java.util.Map">
+		update SM_SSAP set SM_SSAP.zfbz = #{zfbz} where SM_SSAP.sqdh = #{RequestId}
+	</update>
+
+	<update id="updateSSSQState" parameterType="java.util.Map">
+		update sm_sssq set sm_sssq.apbz = #{apbz} where sm_sssq.sqdh = #{RequestId}
+	</update>
+
+	<insert id="addSSAPArrange" parameterType="map">
+		INSERT INTO SM_SSAP
+		(SSBH, JGID,SSKS, SQDH,
+		ZYH, APRQ,SSRQ,  SSNM,
+		SSFJ, SSTH,SSYS, SSYZ,
+		SSEZ,SSSZ,XSHS,XSHS_2,
+		XHHS,XHHS_2,MZDM,MZYS,
+		JZBZ,HZBZ,THBZ,MZBZ,
+		QXBZ,SSBZ,JFBZ,ZFBZ,
+		WCBZ,SHBZ,MZWCBZ)
+		VALUES
+		( #{DQZ}, 1, #{OperationDept,jdbcType=VARCHAR}, #{RequestId},
+		#{ZYH},sysdate,to_date(#{OperationDateTime},'yyyy-mm-dd hh24:mi:ss'),#{OPERATION,jdbcType=VARCHAR},
+		#{OperationRoomNo,jdbcType=VARCHAR},#{OperationCounts,jdbcType=VARCHAR},#{Operator,jdbcType=VARCHAR},#{Assistant1,jdbcType=VARCHAR},
+		#{Assistant2,jdbcType=VARCHAR},#{Assistant3,jdbcType=VARCHAR},#{InstrumentNurse1,jdbcType=VARCHAR},#{InstrumentNurse2,jdbcType=VARCHAR},
+		#{CirculatingNurse1,jdbcType=VARCHAR},#{CirculatingNurse2,jdbcType=VARCHAR},#{AnesthesiaWayCode,jdbcType=VARCHAR},#{AnesthesiaDoctor,jdbcType=VARCHAR},
+		#{JZBZ},0,0,0,
+		0,0,0,0,
+		#{WCBZ},0,#{MZWCBZ}
+		)
+	</insert>
+
+    <select id="queryZYH" parameterType="java.util.Map" resultType="map">
+	    select zyh "zyh",mzdm as "anesthesiaWayCode",ssnm as "operationCode"
+	    from sm_sssq where sqdh = #{RequestId}
+	</select>
+
+    <select id="querySSSQStatus" parameterType="java.util.Map" resultType="java.util.Map">
+      select ZFBZ from sm_sssq where sqdh = #{RequestId}
+    </select>
+
+    <select id="querySSAPArrange" parameterType="java.util.Map"  resultType="java.util.HashMap">
+	select SSBH, JGID,
+		SSKS, SQDH,
+		ZYH, APRQ  from SM_SSAP where sqdh=  #{RequestId} and ZFBZ = 0
+	</select>
+</mapper>

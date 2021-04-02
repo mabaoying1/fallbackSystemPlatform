@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.shengguke.IQueryLisKeyCommonMapper">
+    <!-- 获取DQZ -->
+    <select id="getXH" parameterType="java.util.Map" resultType="java.lang.String">
+		select DQZ from
+		${sysName} t where t.bm = #{bmc}
+	</select>
+
+    <!-- 更新DQZ -->
+    <update id="updateXH" parameterType="java.util.Map">
+	  	update ${sysName} set DQZ = #{dqz}
+	  	where bm = #{bmc} and DQZ = #{olddqz}
+	 </update>
+</mapper>

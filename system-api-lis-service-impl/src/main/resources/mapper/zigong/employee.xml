@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.his.zigong.EmployeeMapper">
+    <insert id="insertEmployee" parameterType="map">
+        insert into ms_brda (
+            ZGID , XM, SRM1, XB,
+            CSRQ, JGID, YGBH, KSDM
+        )values(
+            #{PersonCode},#{PersonName},#{SpellCode},#{Gender},
+            #{Birthday},1,#{PersonCode},#{OfficeCode}
+        )
+
+    </insert>
+
+    <update id="updateEmployee" parameterType="map">
+        update ms_brda
+        <set>
+            <if test=" PersonName != null and  PersonName != '' ">
+                XM = #{PersonName},
+            </if>
+            <if test=" SpellCode != null and  SpellCode != '' ">
+                SRM1 = #{SpellCode},
+            </if>
+            <if test=" Gender != null and  Gender != '' ">
+                XB = #{Gender},
+            </if>
+            <if test=" Birthday != null and  Birthday != '' ">
+                CSRQ = #{Birthday},
+            </if>
+            <if test=" OfficeCode != null and  OfficeCode != '' ">
+                KSDM = #{OfficeCode},
+            </if>
+        </set>
+        WHERE ZGID = #{PersonCode}
+    </update>
+</mapper>

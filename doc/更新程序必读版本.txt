@@ -1,0 +1,23 @@
+
+2021-03-01
+1、程序新集成ES用于存放日志，各系统配置文件需要添加以下配置，否则程序报错（*********重要*********）
+system:
+  #####0 不使用  1使用 [存放日志]
+  isElasticsearch: 0
+  ###elasticsearch的服务器地址
+  elasticsearchHost: 127.0.0.1
+  ####通过http请求的端口号是9200，通过客户端请求的端口号是9300
+  elasticsearchPort: 9300
+  ###设置es集群名称
+  clusterName: my-application
+2、省骨科程序ZY_FYMX处理ZLXZ取值问题（system-api-his-service-impl）
+3、广安新增查询（查询检查申请单是否已经执行）（system-api-his-service-impl）
+4、广安新增查询（人脸识别系统-查询住院患者信息/查询患者住院记录）（system-api-other-service-impl）
+
+2021-03-24
+1、江北中医院迪安接口开发（system-api-platform）
+
+2021-03-26
+1、查询费用项目（system-api-other-service-impl）
+2、住院补计费用（system-api-other-service-impl）
+3、住院作废补计费用（system-api-other-service-impl）

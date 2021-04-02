@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+
+<mapper namespace="com.soft.api.mapper.lis.SC.QueryPatientChaperoneMapper">
+<!--    查询住院患者陪护者信息-->
+    <select id="queryPatientChaperone" parameterType="map" resultType="map">
+        select  * from v_rlsb_pbzxx
+        <where>
+            <if test="patientid != null and patientid != ''">
+                and PATIENTID = #{patientid}
+            </if>
+            <if test="sfzh != null and sfzh != ''">
+                and SFZH = #{sfzh}
+            </if>
+        </where>
+    </select>
+<!--    查询住院患者陪护者核算检测结果-->
+    <select id="queryPatientChaperoneNucleateResult" parameterType="map" resultType="map">
+        select  * from v_rlsb_hsjg
+        <where>
+            <if test="patientid != null and patientid != ''">
+                and PATIENTID = #{patientid}
+            </if>
+            <if test="sfzh != null and sfzh != ''">
+                and SFZH = #{sfzh}
+            </if>
+        </where>
+    </select>
+</mapper>

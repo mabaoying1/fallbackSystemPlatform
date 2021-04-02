@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.his.shengguke.IExmReportAuditORCanceMapper">
+
+
+	<select id="isReportReview" parameterType="map" resultType="int">
+		select count(*) from EMR_JCBG where sqdh = #{ExmRequest.RequestId}
+	</select>
+
+    <update id="updateJcztStatusAudit" parameterType="map">
+		 UPDATE emr_jcsq
+		 SET
+		 shsj = to_date(#{AUDITDATETIME},'yyyy-mm-dd hh24:mi:ss'),
+		 shys = #{AUDITDOCTOR},
+		 jczt = 5
+		 WHERE sqdh = #{ExmRequest.RequestId}
+	</update>
+
+    <update id="updateJcztStatusCancel" parameterType="java.util.HashMap">
+		UPDATE emr_jcsq SET
+		shsj = Null,
+		shys = Null,
+		jczt = 4
+		WHERE sqdh = #{ExmRequest.RequestId}
+	</update>
+
+    <delete id="deleteJCBGByID" parameterType="java.util.HashMap">
+		delete from EMR_JCBG where sqdh= #{ExmRequest.RequestId}
+	</delete>
+
+</mapper>

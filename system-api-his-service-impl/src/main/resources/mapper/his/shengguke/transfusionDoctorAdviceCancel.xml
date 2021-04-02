@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+
+<mapper namespace="com.soft.api.mapper.his.shengguke.ITransfusionDoctorAdviceCancelMapper">
+
+    <select id="getEmrYzb" parameterType="map" resultType="map">
+        <!-- select KZKS ,YZZT from emr_yzb where yzbxh = #{orderno} -->
+        select
+        ( select max(ptksdm) from gy_ksdm where ksdm = (select KZKS from emr_yzb t where t.yzbxh = #{orderno}))
+        as KZKS
+        ,YZZT from emr_yzb t where t.yzbxh = #{orderno}
+    </select>
+
+    <select id="getBQYZCount" parameterType="map" resultType="int">
+        select count(*) from zy_bqyz where ysyzbh = #{orderno} and zfbz =1
+    </select>
+
+    <update id="updateBQYZ" parameterType="map">
+        update zy_bqyz set zfbz =1  where ysyzbh = #{orderno}
+    </update>
+
+    <update id="updateYZB" parameterType="map">
+        UPDATE EMR_YZB SET YZZT = 3  where yzbxh = #{orderno}
+    </update>
+
+    <insert id="insertYzbczrz" parameterType="map">
+        INSERT INTO emr_yzbczrz(CZXH,YZBXH,CZSJ,CZJS,CZGH,CZLX,QZZT,HZZT,WTMS)
+        VALUES(#{yzbczrz},#{orderno},SYSDATE,1,#{operperson},3,1,3,#{operreason})
+    </insert>
+</mapper>

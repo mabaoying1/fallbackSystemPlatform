@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+
+<mapper namespace="com.soft.api.mapper.shengguke.EMRDocumentRegistryMapper">
+
+
+    <insert id="testLcn" parameterType="map">
+        insert into test(id , name) values( #{id}, #{name})
+    </insert>
+    <update id="updateJytmxxSampleNo" parameterType="map">
+        update l_jytmxx
+		Set sampleno = #{SAMPLENO}
+		where doctadviseno =#{DOCTADVISENO}
+    </update>
+
+    <update id="updateJytmxxSampleType" parameterType="map">
+        update l_jytmxx set sampleType = #{SAMPLETYPE}
+        where DOCTADVISENO = #{DOCTADVISENO}
+    </update>
+
+
+    <!-- 省骨科微生物查询TESTID,BIOID,ANITID 获取方式 -->
+
+        <select id="getAntiID" parameterType="map" resultType="map">
+            select ANTIID from l_anti_dict t where t.englishab = #{TESTCODE}
+        </select>
+
+        <select id="getBioID" parameterType="map" resultType="map">
+            select BIOID AS TESTID from l_bio_dict t where t.englishab = #{TESTCODE}
+        </select>
+
+    <!-- -->
+    <select id="getTestIDByBIO" parameterType="map" resultType="map">
+		select TESTID FROM l_channel_bio t where t.channel = #{TESTCODE} and flag = 1
+	</select>
+
+    <select id="getTestIDByANIT" parameterType="map" resultType="map">
+		select TESTID FROM l_channel_bio t where t.channel = #{TESTCODE} and flag = 0
+	</select>
+
+    <select id="isAntiResult" parameterType="map" resultType="int">
+        SELECT  count(*)
+        FROM  l_anti_result
+        WHERE teststatus &lt; 4
+        AND bioid    = #{BIOID}
+        AND antiid   = #{ANTIID}
+        AND sampleno = #{SAMPLENO}
+    </select>
+
+    <select id="isBioResult" parameterType="map" resultType="int">
+        SELECT  count(*) FROM  l_bio_result WHERE bioid = #{BIOID} AND  sampleno = #{SAMPLENO}
+    </select>
+
+    <select id="getAntiDic" parameterType="map" resultType="map">
+		SELECT  t.ANTIID, t.DOSEAGE1, t.DOSEAGE2, t.U_CON1, t.U_CON2, t.B_CON1,  t.B_CON2
+		FROM l_channel c left join l_anti_dict t on t.ANTIID = c.TESTID
+		Where t.usenow = 1 AND c.channel = #{CHINESENAME}
+	</select>
+
+    <insert id="insertAntiResult" parameterType="map">
+		INSERT INTO l_anti_result
+		(sampleno,  bioid, sampletype,
+		bio_type, section,  unit, antiid, testresult,
+		micresult, operator, labdepartment,
+		stayhospitalmode, antiname, method, doseage1,
+		doseage2, u_con1, u_con2,   b_con1,
+		b_con2, biono, antigroup, kbresult,pro_result, measuetime,teststatus)
+		VALUES(#{SAMPLENO,jdbcType=VARCHAR},#{BIOID,jdbcType=VARCHAR} , #{SAMPLETYPE,jdbcType=VARCHAR},
+		0, #{LABDEPARTMENT,jdbcType=VARCHAR}, #{ResultUnit,jdbcType=VARCHAR},#{ANTIID,jdbcType=VARCHAR}, #{TESTRESULT,jdbcType=VARCHAR},
+		#{MICResult,jdbcType=VARCHAR},  #{OPERATOR,jdbcType=VARCHAR}, #{LABDEPARTMENT,jdbcType=VARCHAR},
+		#{STAYHOSPITALMODE,jdbcType=NUMERIC}, #{AntiName,jdbcType=VARCHAR}, 0,  #{DOSEAGE1,jdbcType=VARCHAR},
+		#{DOSEAGE2,jdbcType=VARCHAR}, #{U_CON1,jdbcType=VARCHAR},#{U_CON2,jdbcType=VARCHAR}, #{B_CON1,jdbcType=VARCHAR},
+		#{B_CON2,jdbcType=VARCHAR},#{BIONO,jdbcType=NUMERIC},'',
+		#{KBResult,jdbcType=VARCHAR},'',to_date(#{REPORTDATE} , 'yyyy-MM-dd hh24:mi:ss'),1 )
+	</insert>
+
+    <update id="updateAntiResult" parameterType="map">
+		UPDATE l_anti_result
+		SET
+					antiname = #{AntiName,jdbcType=VARCHAR}, method = 0,
+					doseage1 = #{DOSEAGE1,jdbcType=VARCHAR},
+					doseage2 = #{DOSEAGE2,jdbcType=VARCHAR},
+					u_con1 = #{U_CON1,jdbcType=VARCHAR}, u_con2 = #{U_CON2,jdbcType=VARCHAR},
+					b_con1 = #{B_CON1,jdbcType=VARCHAR}, b_con2 = #{B_CON2,jdbcType=VARCHAR},
+					micresult   = #{MICResult,jdbcType=VARCHAR},
+					testresult  = #{TESTRESULT,jdbcType=VARCHAR},
+					measuetime  = to_date(#{REPORTDATE} , 'yyyy-MM-dd hh24:mi:ss') ,
+					operator    = #{OPERATOR,jdbcType=VARCHAR},
+					teststatus = 1,
+					labdepartment = #{LABDEPARTMENT,jdbcType=VARCHAR},
+					bio_type      = 0,
+					section       = #{LABDEPARTMENT,jdbcType=VARCHAR},
+					sampletype    = #{SAMPLETYPE,jdbcType=VARCHAR},
+					stayhospitalmode = #{STAYHOSPITALMODE,jdbcType=NUMERIC},
+					antigroup = '',
+					kbresult = #{KBResult,jdbcType=VARCHAR},
+					pro_result = ''
+					WHERE bioid = #{BIOID}
+					AND antiid   = #{ANTIID}
+					AND sampleno = #{SAMPLENO}
+	</update>
+
+
+    <insert id="insertBioResult" parameterType="map">
+	INSERT INTO l_bio_result(
+	    sampleno , bioid ,sampletype ,bio_type,
+		section ,patientid  ,ID_card ,infantflag ,
+		bio_quantity, deviceid ,operator,labdepartment,
+		stayhospitalmode ,biono,spectrum,remark,measuetime)
+		VALUES(
+		#{SAMPLENO,jdbcType=VARCHAR}, #{BIOID,jdbcType=VARCHAR} ,#{SAMPLETYPE,jdbcType=VARCHAR}, 0 ,
+		#{LABDEPARTMENT,jdbcType=VARCHAR}, #{PATIENTID,jdbcType=VARCHAR},#{SFZH,jdbcType=VARCHAR},#{INFANTFLAG,jdbcType=NUMERIC},
+		#{BioQuantity,jdbcType=VARCHAR},'863',#{OPERATOR,jdbcType=VARCHAR},#{LABDEPARTMENT,jdbcType=VARCHAR},
+		#{STAYHOSPITALMODE,jdbcType=NUMERIC},#{BIONO,jdbcType=VARCHAR},
+		'','',to_date(#{REPORTDATE} , 'yyyy-MM-dd hh24:mi:ss'))
+	</insert>
+
+    <update id="updateBioResult" parameterType="map">
+		UPDATE l_bio_result
+		SET
+		measuetime = to_date(#{REPORTDATE} , 'yyyy-MM-dd hh24:mi:ss'),
+		deviceid = #{OPERATOR} ,
+		operator = #{OPERATOR}  ,
+		teststatus = 1,
+		labdepartment = #{LABDEPARTMENT,jdbcType=VARCHAR},
+		bio_type      = 0,
+ 		<!-- section       = '863', -->
+		<!-- patientid     = #{PATIENTID,jdbcType=VARCHAR}, -->
+		infantflag    = #{INFANTFLAG,jdbcType=NUMERIC},
+		stayhospitalmode = #{STAYHOSPITALMODE,jdbcType=NUMERIC},
+		biono            = #{BioNO,jdbcType=VARCHAR},
+		spectrum       = '',
+        BIO_QUANTITY = #{BioQuantity,jdbcType=VARCHAR},
+		remark         = ''
+		WHERE bioid = #{BIOID}
+		AND sampleno = #{SAMPLENO}
+	</update>
+
+
+    <select id="getSampleType" parameterType="map" resultType="map">
+		select * from L_SAMPLETYPE t where t.sampledescribe = #{SampleTypeName}
+	</select>
+
+    <insert id="insertPlantResult" parameterType="map">
+		INSERT INTO l_plant_result
+		(sampleno,  testid, testresult,sampletype, resulttype, planttype,section, patientid,
+		ID_card, infantflag, stayhospitalmode,  labdepartment,    operator,measuetime )
+		VALUES(#{SAMPLENO,jdbcType=VARCHAR}, #{TESTID,jdbcType=VARCHAR},  #{TESTRESULT,jdbcType=VARCHAR},
+			 #{SAMPLETYPE,jdbcType=VARCHAR}, #{RESULTTYPE,jdbcType=VARCHAR}, 0, #{SECTION,jdbcType=VARCHAR} ,
+			 #{PATIENTID,jdbcType=VARCHAR}, #{SFZH,jdbcType=VARCHAR}, #{INFANTFLAG,jdbcType=NUMERIC},
+			 #{STAYHOSPITALMODE,jdbcType=NUMERIC},#{LABDEPARTMENT,jdbcType=VARCHAR}, #{OPERATOR},
+			 to_date(#{REPORTDATE} , 'yyyy-MM-dd hh24:mi:ss'))
+	</insert>
+
+    <!-- 根据编码找到对应的testID -->
+    <select id="getTestIDBy" parameterType="map" resultType="map">
+		select TESTID FROM l_channel t where t.channel = #{TESTCODE}
+	</select>
+
+    <update id="updatePlantResult" parameterType="map">
+        UPDATE l_plant_result
+        SET
+        testresult = #{TESTRESULT},
+        resulttype = #{RESULTTYPE}
+        WHERE testid = #{TESTID}
+        AND sampleno = #{SAMPLENO}
+    </update>
+
+    <select id="isPlantResult" parameterType="map" resultType="int">
+        SELECT count(*) FROM l_plant_result Where testid = #{TESTID} AND sampleno = #{SAMPLENO}
+    </select>
+
+
+    <select id="isReview" parameterType="map" resultType="int">
+        select count(1) counts from l_patientinfo
+        where doctadviseno=#{DOCTADVISENO}  and SAMPLENO = #{SampleNo}  and  RESULTSTATUS &gt;= 4
+    </select>
+
+    <delete id="deletePatientInfo" parameterType="map">
+        delete from l_patientinfo where doctadviseno = #{DOCTADVISENO} and SAMPLENO = #{SampleNo}
+        and RESULTSTATUS &lt; 4
+    </delete>
+
+
+    <select id="getJyTmXx" parameterType="map" resultType="map">
+        select
+        '' as NOTES,
+        DIAGNOSTIC,
+        EXAMINAIM,
+        PATIENTNAME,
+        SAMPLETYPE,
+        FEE,
+        SFZH,
+        AGE as NL,
+        1 as RESULTSTATUS,
+        BRXZ,
+        BRBQ,
+        JZXH as
+        VISITID,
+        SECTION,
+        EXAMINAIMCODE,
+        LABDEPARTMENT,
+        REQUESTER,
+        DOCTADVISENO,
+        EXECUTETIME,
+        REQUESTTIME,
+        20 as CYCLE,
+        SEX,
+        STAYHOSPITALMODE,
+        BIRTHDAY,
+        FEESTATUS,
+        DOCTREQUESTNO as REQUESTID,
+        1 as CISBORDER,
+        1 as EDITSTATUS,
+        AGE_UNIT as NLDW,
+        PATIENTID,
+        BAHM,
+        0 as AUTOCHECK_STATUS,
+        REQUESTMODE,
+        INFANTFLAG,
+        YEWYH,
+        0 as FZCS,
+        0 as SFBZ,
+        BED_NO AS DEPART_BED,
+        RECEIVETIME
+        from l_jytmxx
+        where
+        doctrequestno = #{ELECTRONICREQUESTNOTEID}
+        and
+        doctadviseno = #{DOCTADVISENO}
+    </select>
+
+
+    <insert id="insertPatientInfo" parameterType="map">
+        insert into l_patientinfo(
+		NOTES,DIAGNOSTIC,EXAMINAIM,PATIENTNAME,
+		SAMPLETYPE,FEE,SFZH,
+		NL,RESULTSTATUS,BRXZ,BRBQ,
+		VISITID,SECTION,EXAMINAIMCODE,LABDEPARTMENT,
+		REQUESTER,SAMPLENO,DOCTADVISENO,EXECUTETIME,
+		REQUESTTIME,CYCLE,SEX,STAYHOSPITALMODE,
+		BIRTHDAY,FEESTATUS,REQUESTID,CISBORDER,
+		EDITSTATUS,NLDW,PATIENTID,BAHM,
+		AUTOCHECK_STATUS,REQUESTMODE,INFANTFLAG,
+		YEWYH,FZCS,SFBZ,depart_bed,ybid,
+		RECEIVETIME)
+		values
+		(#{NOTES,jdbcType=VARCHAR},#{DIAGNOSTIC,jdbcType=VARCHAR},#{EXAMINAIM,jdbcType=VARCHAR},#{PATIENTNAME,jdbcType=VARCHAR},
+		#{SAMPLETYPE,jdbcType=VARCHAR},#{FEE,jdbcType=NUMERIC},#{SFZH,jdbcType=VARCHAR},
+		#{NL,jdbcType=VARCHAR},#{RESULTSTATUS,jdbcType=NUMERIC},#{BRXZ,jdbcType=NUMERIC},#{BRBQ,jdbcType=VARCHAR},
+		#{VISITID,jdbcType=NUMERIC},#{SECTION,jdbcType=VARCHAR},#{EXAMINAIMCODE,jdbcType=VARCHAR},#{LABDEPARTMENT,jdbcType=VARCHAR},
+		#{REQUESTER,jdbcType=VARCHAR},#{SAMPLENO,jdbcType=VARCHAR},#{DOCTADVISENO,jdbcType=VARCHAR},#{EXECUTETIME,jdbcType=DATE},
+		#{REQUESTTIME},#{CYCLE,jdbcType=VARCHAR},#{SEX,jdbcType=VARCHAR},#{STAYHOSPITALMODE,jdbcType=NUMERIC},
+		#{BIRTHDAY},#{FEESTATUS,jdbcType=NUMERIC},#{REQUESTID,jdbcType=VARCHAR},#{CISBORDER,jdbcType=NUMERIC},
+		#{EDITSTATUS,jdbcType=NUMERIC},#{NLDW,jdbcType=VARCHAR},#{PATIENTID,jdbcType=VARCHAR},#{BAHM,jdbcType=VARCHAR},
+		#{AUTOCHECK_STATUS,jdbcType=NUMERIC},#{REQUESTMODE,jdbcType=NUMERIC},#{INFANTFLAG,jdbcType=NUMERIC},
+		#{YEWYH,jdbcType=NUMERIC},#{FZCS,jdbcType=NUMERIC},#{SFBZ,jdbcType=NUMERIC},#{DEPART_BED,jdbcType=VARCHAR},#{YBID,jdbcType=VARCHAR},
+		#{RECEIVETIME,jdbcType=DATE})
+    </insert>
+
+
+    <delete id="delTestResult" parameterType="map">
+        delete from l_testresult where sampleno= #{SampleNo} and testid
+        in
+        <foreach collection="TESTID" item="item" index="index" open = "(" separator= "," close=")" >
+            #{item}
+        </foreach>
+    </delete>
+
+
+    <select id="queryEMRDocumentRegistryParaD" parameterType="map" resultType="java.util.HashMap">
+        select
+        '00' as SAMPLETYPE,
+        'AAAAAA' as RESULTFLAG,
+        1 as TESTSTATUS,
+        '' as LABDEPARTMENT,
+        sysdate  as MEASURETIME,
+        0 as ISPRINT,
+        1 as MEASURENUM,
+        1 as CORRECTFLAG,
+        '' as OPERATOR,
+        '' as DEVICEID,
+        0 as FEE,
+        0 as ARCHIVESTATUS,
+        0 as EDITSTATUS,
+        0 as ISWJZ
+        from dual
+    </select>
+
+
+    <insert id="addEMRDocumentRegistryD" parameterType="java.util.List">
+        insert into l_testresult(
+        SAMPLETYPE,RESULTFLAG,TESTSTATUS,LABDEPARTMENT,
+        SAMPLENO,MEASURETIME,REFHI,ISPRINT,
+        MEASURENUM,CORRECTFLAG,TESTID,OPERATOR,
+        DEVICEID,TESTRESULT,FEE,ARCHIVESTATUS,
+        EDITSTATUS,REFLO,ISWJZ,UNIT,
+        HINT
+        )
+        <!-- oracle 批量插入不要 values 关键字 -->
+        <foreach collection="list" item="item" index="index"
+                 separator=" union all ">
+            (SELECT
+            #{item.SAMPLETYPE,jdbcType=VARCHAR},#{item.RESULTFLAG,jdbcType=VARCHAR},#{item.TESTSTATUS,jdbcType=NUMERIC},#{item.LABDEPARTMENT,jdbcType=VARCHAR},
+            #{item.SAMPLENO,jdbcType=VARCHAR},#{item.MEASURETIME},#{item.REFHI,jdbcType=VARCHAR},#{item.ISPRINT,jdbcType=NUMERIC},
+            #{item.MEASURENUM,jdbcType=NUMERIC},#{item.CORRECTFLAG,jdbcType=NUMERIC},#{item.TESTID,jdbcType=VARCHAR},#{item.OPERATOR,jdbcType=VARCHAR},
+            #{item.DEVICEID,jdbcType=VARCHAR},#{item.TESTRESULT,jdbcType=VARCHAR},#{item.FEE,jdbcType=NUMERIC},#{item.ARCHIVESTATUS,jdbcType=NUMERIC},
+            #{item.EDITSTATUS,jdbcType=NUMERIC},#{item.REFLO,jdbcType=VARCHAR},#{item.ISWJZ,jdbcType=NUMERIC},#{item.UNIT,jdbcType=VARCHAR},
+            #{item.HINT, jdbcType=VARCHAR}
+            FROM DUAL)
+        </foreach>
+    </insert>
+
+
+    <select id="queryTestId" parameterType="java.util.List" resultType="String">
+        select testid from l_testdescribe where testid  in
+        <foreach collection="TESTID" item="item" index="index" open = "(" separator= "," close=")" >
+            #{item}
+        </foreach>
+    </select>
+
+
+    <insert id="addLtestdescribe" parameterType="java.util.List">
+        insert into l_testdescribe (
+        TESTID, CHINESENAME, UNIT, LABDEPARTMENT
+        )
+        <foreach collection="list" item="item" index="index"
+                 separator=" union all ">
+            (SELECT
+            #{item.TESTID},#{item.TESTNAME},#{item.UNIT},#{item.LABDEPARTMENT}
+            FROM DUAL)
+        </foreach>
+    </insert>
+
+
+<!--
+    <select id="" parameterType="map" resultType="">
+        SELECT count(*) FROM l_plant_result Where testid = :ls_testid AND sampleno = :as_sampleno;
+    </select>-->
+
+
+
+</mapper>

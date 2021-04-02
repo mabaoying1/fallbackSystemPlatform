@@ -1,0 +1,46 @@
+#  cloud:
+#     client:
+#      ipAddress: 127.0.0.1
+#    instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
+#    prefer-ip-address: true #访问路径可以显示IP
+
+
+select t.*, t.rowid from l_jytmxx t where t.patientid = '00000241';
+select t.*, t.rowid from l_jytmxx_mx t where t.doctadviseno = 'DSF120120800113A' ;
+select t.*, t.rowid  from l_lis_sqd t where t.doctrequestno = '3114' ;
+select t.*, t.rowid from l_lis_sqdmx t where t.doctrequestno = '3114' ;--120120800113
+select t.*, t.rowid from l_lis_sqdmx t where t.doctrequestno = '3940' ;
+--3114     3940
+
+select doctrequestno ,stayhospitalmode as MZZYCODE from l_lis_sqd where stayhospitalmode = 1;
+select * from l_lis_sqd t where t.doctrequestno = '3940'; --120120800114
+select * from l_lis_sqdmx t where t.doctrequestno = '3940';
+
+select t.*, t.rowid from l_jytmxx t where t.patientid = '00000241'; --00000241  15012212094
+
+select * from gy_xhb t where t.bm = 'L_JYTMXX_BBZQ'; --3688797
+
+
+select t.*, t.rowid  from l_plant_result t where t.sampleno = '20160606WSW1003' and testid = 5316;
+
+select * from  l_bio_result t where t.sampleno = '20160606WSW1003' and bioid = 5316;
+
+select * from L_ANTI_RESULT;
+
+select t.*, t.rowid  from l_plant_result t where testid in (
+
+select testid from l_channel t )
+
+
+
+  select t.*,t.rowid from ms_yj01 t where t.sqid = '4713';
+  select t.*,t.rowid from  zy_bqyz t where t.sqid = '3114' ;
+  select t.*,t.rowid from  zy_bqyz t where t.jlxh = '10000' ;
+  select * from zy_fymx t where t.jlxh = '28555797';
+  select t.*,t.rowid  from zy_fymx t where t.zyh  = 538 ;
+  select * from ms_yj01 where sqid = '3940';
+
+  select fygb as FYXM from gy_ylsf where fyxh = 167481;
+
+  select t.*,t.rowid from zy_brry t where t.zyh = 538;
+  select * from gy_identity_zy t where t.bmc = 'ZY_FYMX'; --28555801

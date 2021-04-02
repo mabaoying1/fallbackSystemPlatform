@@ -1,0 +1,155 @@
+#localhost:8300/ws-api/lisShengGuKe?wsdl
+#   <![CDATA[     ]]>  http://192.168.0.195:8300/ws-api/lisShengGuKe?wsdl
+#https://blog.csdn.net/justlpf/article/details/84343845
+#https://www.cnblogs.com/jagerLan/p/10455319.html
+
+server:
+  port: 8300
+  max-http-header-size: 502400
+  tomcat:
+    # tomcat的URI编码
+    uri-encoding: UTF-8
+    # tomcat最大线程数，默认为200
+    max-threads: 800
+    # Tomcat启动初始化的线程数，默认值25
+    min-spare-threads: 30
+###服务别名----服务注册到注册中心名称
+##com.mysql.jdbc.Driver
+##com.microsoft.sqlserver.jdbc.SQLServerDriver
+##oracle.jdbc.driver.OracleDriver
+spring:
+  application:
+    name: app-soft-lis
+  lis:
+    datasource:
+      type: com.alibaba.druid.pool.DruidDataSource
+      driverClassName: oracle.jdbc.driver.OracleDriver
+#      url: jdbc:oracle:thin:@192.168.0.109:1521:orcl2
+      ##省骨科
+      url: jdbc:oracle:thin:@196.168.0.166:1521:his
+#      url: jdbc:oracle:thin:@118.126.110.229:1521:orcl
+      username: zhlis
+      password: ZHLIS%1123
+#      password: zhlis
+#      driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#      url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=test
+#      username: sa
+#      password: 123456
+      # 初始连接数
+      initialSize: 5
+      # 最小连接池数量
+      minIdle: 10
+      # 最大连接池数量
+      maxActive: 200
+      # 配置获取连接等待超时的时间
+      maxWait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      minEvictableIdleTimeMillis: 300000
+      # 配置一个连接在池中最大生存的时间，单位是毫秒
+      maxEvictableIdleTimeMillis: 900000
+      # 配置检测连接是否有效
+      validationQuery: SELECT 1 from dual
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      #超过时间限制是否回收
+      removeAbandoned: true
+      #超时时间；单位为秒。180秒=3分钟
+      removeAbandonedTimeout: 300
+      #关闭abanded连接时输出错误日志 正式环境一般关闭
+      logAbandoned: false
+  cloud:
+    client:
+      ipAddress: 127.0.0.1
+eureka:
+  client:
+    service-url:
+    ##### 当前会员服务注册到eureka服务地址
+       #defaultZone: http://172.77.73.230:8100/eureka
+       defaultZone: http://127.0.0.1:8100/eureka
+    ### 需要将我的服务注册到eureka上
+    register-with-eureka: true
+    ####需要检索服务
+    fetch-registry: true
+    registry-fetch-interval-seconds: 30
+# 心跳检测检测与续约时间
+# 测试时将值设置设置小些，保证服务关闭后注册中心能及时踢出服务
+  instance:
+    instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
+    prefer-ip-address: true #访问路径可以显示IP
+###Eureka客户端向服务端发送心跳的时间间隔，单位为秒（客户端告诉服务端自己会按照该规则）  
+    lease-renewal-interval-in-seconds: 30
+####Eureka服务端在收到最后一次心跳之后等待的时间上限，单位为秒，超过则剔除（客户端告诉服务端按照此规则等待自己）
+    lease-expiration-duration-in-seconds: 90
+
+
+###springcloud  feign 默认开启支持ribbon 
+###设置feign客户端超时时间 
+###默认是一秒钟超过1S 异常 java.net.SocketTimeoutException: Read timed out
+ribbon:
+###指的是建立连接所用的时间，适用于网络状况正常的情况下，两端连接所用的时间。
+ ReadTimeout: 80000
+###指的是建立连接后从服务器读取到可用资源所用的时间。 
+ ConnectTimeout: 50000
+ 
+#####开启hystrix
+feign:
+  hystrix:
+    enabled: true
+#####
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 30000
+
+####
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  # 加载全局的配置文件
+  ###configLocation: classpath:mybatis-config.xml
+logging:
+  level:
+    com:
+      soft:
+        api:
+          service: debug
+          mapper: debug
+      codingapi:
+        txlcn: DEBUG
+##############################################
+# 是否启动LCN负载均衡策略(优化选项，开启与否，功能不受影响)
+tx-lcn:
+  ribbon:
+    loadbalancer:
+      dtx:
+        enabled: true
+  # 默认之配置为TM的本机默认端口
+  client:
+    manager-address: 127.0.0.1:8070
+  # 开启日志,默认为false
+  logger:
+    enabled: true
+#    driver-class-name: com.mysql.jdbc.Driver
+#    jdbc-url: jdbc:mysql://127.0.0.1:3306/test?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8
+#    username: root
+#    password: bsoft
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    jdbc-url: jdbc:oracle:thin:@196.168.0.166:1521:his
+    username: zhlis
+    password: ZHLIS%1123
+
+
+system:
+  #####0 不使用  1使用 [存放日志]
+  isElasticsearch: 0
+  ###elasticsearch的服务器地址
+  elasticsearchHost: 127.0.0.1
+  ####通过http请求的端口号是9200，通过客户端请求的端口号是9300
+  elasticsearchPort: 9300
+  ###设置es集群名称
+  clusterName: my-application

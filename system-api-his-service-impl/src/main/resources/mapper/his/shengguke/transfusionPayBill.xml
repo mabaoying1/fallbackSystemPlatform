@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+
+<mapper namespace="com.soft.api.mapper.his.shengguke.ITransfusionPayBillMapper">
+
+    <select id="getPatientInfo" parameterType="map" resultType="map">
+        select ZYH, BRBQ, ZZYS, CYPB from zy_brry where zyhm = #{outpatient_id}
+    </select>
+
+    <select id="getYLML" parameterType="map" resultType="map">
+        select FYMC, FYGB from gy_ylml where fyxh = #{item_code}
+    </select>
+
+    <select id="getMaxJlxh" parameterType="map" resultType="map">
+        select  max(jlxh) as JLXH from zy_bqyz
+        where zyh = #{outpatient_id} and sqid = #{apply_no} and zfbz = 0
+    </select>
+
+    <insert id="insertZYFYMX" parameterType="java.util.List">
+        INSERT INTO ZY_FYMX(
+            JLXH,JGID,ZYH,FYRQ,FYXH,
+            FYMC,FYSL,FYDJ,ZJJE,ZFJE,
+            YSGH,SRGH,QRGH,
+            FYKS,
+            FYBQ,
+            ZXKS,JFRQ,XMLX,YPLX,FYXM,
+            JSCS,ZFBL,YZXH,YBSC,YTSL,TFGL,SXSQDH,BRBQ)
+        <foreach collection="list" item="item" index="index"
+                 separator=" union all ">
+            (SELECT
+            #{item.jlxh},1,#{item.outpatient_id},to_date(#{item.item_date},'yyyy-mm-dd hh24:mi:ss'), #{item.item_code},
+            #{item.fymc},#{item.order_itemcount},#{item.order_itemprice},#{item.order_itemcount} * #{item.order_itemprice},#{item.order_itemcount} * #{item.order_itemprice},
+            #{item.order_operperson},#{item.order_inputperson},#{item.order_inputperson},
+            (select max(ksdm) from gy_ksdm where ptksdm = #{item.patient_dept} and zysy = 'Y'),
+            (select max(ksdm) from gy_ksdm where ptksdm = #{item.patient_ward} and bqsy = 'Y'),
+            560<!--#{item.patient_exec}-->,SYSDATE,#{item.exec_source},0,#{item.fygb},
+            0,1,#{item.yzxh},0,0,#{item.jlxh},#{item.apply_no},#{item.brbq}
+            FROM DUAL)
+        </foreach>
+    </insert>
+    
+</mapper>

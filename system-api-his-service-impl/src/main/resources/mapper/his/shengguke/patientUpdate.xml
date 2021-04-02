@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.his.shengguke.IPatientUpdateImplMapper">
+
+	<select id="getDefaultBRXZ" parameterType="map" resultType="map">
+		select CSZ from gy_xtcs t where t.CSMC = 'MRXZ' AND t.JGID = 1
+	</select>
+
+    <select id="getExistEmployeeByIDCard" parameterType="java.util.Map" resultType="int">
+		SELECT COUNT(1)  From MS_BRDA Where sfzh = #{IdCard} and mzhm <![CDATA[ <> ]]>'住院登记'
+		<!-- And Exists (SELECT 1 From ms_brzh Where ms_brzh.zfpb = 0 And ms_brzh.brid = MS_BRDA.brid) -->
+		and ZXBZ = 0
+		<!--  and brid = #SourcePatientId# -->
+	</select>
+
+    <update id="updateBrda" parameterType="java.util.Map">
+		update ms_brda
+		set
+		BRXM = #{Name},
+		BRXB = #{Sex},
+		CSNY = to_date(#{BirthDate}, 'yyyy-mm-dd hh24:mi:ss'),
+		HKDZ = #{Address,jdbcType=VARCHAR},
+		JDR = #{jdr,jdbcType=VARCHAR},
+		XGSJ = sysdate,
+		JTDH = #{PatientPhone,jdbcType=VARCHAR},
+		BRXZ = #{BRXZ},
+		XZZ_DH = #{PatientPhone,jdbcType=VARCHAR},
+		JHRM = #{ContactPerson,jdbcType=VARCHAR},
+		LXDH = #{ContactPersonTel,jdbcType=VARCHAR},
+		xzz_qtdz = #{Address,jdbcType=VARCHAR},
+		lxrm = #{ContactPerson,jdbcType=VARCHAR},
+		lxdz = #{Address,jdbcType=VARCHAR}
+		where SFZH = #{IdCard} and ZXBZ = 0
+	</update>
+
+	<update id="updateKHBrda" parameterType="map">
+		update kh_brda
+		set
+		jdry = #{jdr} ,
+		jdrq = to_date(#{SystemTime},'yyyy-MM-dd hh24:mi:ss'),
+		jgid = #{JGID},
+		brxm = #{Name},
+		brxb = #{Sex},
+		csrq = TO_DATE(#{BirthDate},'yyyy-mm-dd hh24:mi:ss'),
+		hkdz = #{Address,jdbcType=VARCHAR},
+		jtdh = #{PatientPhone,jdbcType=VARCHAR}
+		where sfzh = #{IdCard}
+	</update>
+
+</mapper>

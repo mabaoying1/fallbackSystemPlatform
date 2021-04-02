@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+
+<mapper namespace="com.soft.api.mapper.his.shengguke.IEMRDocumentRegistryMapper">
+
+    <!-- 查询检查项目中医嘱序号，用于检查报告一个申请单对多个报告 -->
+    <select id="getJcxmYzxh" parameterType="map" resultType="map">
+        select YZXH from emr_jcxm where sqdh = #{ELECTRONICREQUESTNOTEID} and ZLXMID = #{ExaminationItemCode}
+    </select>
+
+    <update id="updateJCSQ" parameterType="map">
+        update emr_jcsq set jczt = 4 where sqdh = #{ELECTRONICREQUESTNOTEID}
+    </update>
+
+    <insert id="test" parameterType="map">
+        insert into test(id,name) values(#{id},#{name})
+    </insert>
+
+    <!-- 是否审核 -->
+    <select id="isReview" parameterType="map" resultType="java.lang.Integer">
+		select count(1) from emr_jcsq
+		where sqdh = #{ELECTRONICREQUESTNOTEID} and jczt > 4
+	</select>
+
+    <!-- 查询申请单号 -->
+    <select id="queryDocumentRegistryPUEPara" parameterType="java.util.HashMap"
+            resultType="java.util.HashMap">
+        select
+        JZLX,
+        JZHM as JZXH,
+        JZHM,
+        SQDH,
+        kdsj as KDRQ,
+        KDKS,
+        KDYS,
+        JCLX,
+        0 as YXZT
+        from emr_jcsq
+        where sqdh = #{ELECTRONICREQUESTNOTEID}
+    </select>
+
+    <delete id="deleteBySqdh" parameterType="java.util.HashMap">
+		delete from EMR_JCBG where sqdh= #{ELECTRONICREQUESTNOTEID}
+	    <if test="YZXH != null and YZXH != ''">
+            and YZXH = #{YZXH}
+        </if>
+	</delete>
+
+    <insert id="addDocumentRegistryPUE" parameterType="java.util.HashMap">
+		INSERT  INTO EMR_JCBG(
+		JLXH,JZLX,JZXH,JZHM,BRBH,
+		SQDH,KDRQ,KDKS,KDYS,JCLX,
+		JCJG,LCZD,YXZT,BGKS,BGYS,BGRQ,
+		YZXH)
+		values
+		(#{JLXH}, #{JZLX}, #{JZXH}, #{JZHM},#{BRBH,jdbcType=VARCHAR},
+		#{SQDH},to_date(#{KDRQ}, 'yyyy-mm-dd hh24:mi:ss') ,#{KDKS,jdbcType=VARCHAR},#{KDYS,jdbcType=VARCHAR},#{JCLX,jdbcType=VARCHAR},
+		#{JCJG,jdbcType=VARCHAR},#{LCZD,jdbcType=VARCHAR},#{YXZT,jdbcType=VARCHAR},#{BGKS,jdbcType=VARCHAR},#{BGYS,jdbcType=VARCHAR}, to_date(#{BGRQ}, 'yyyy-mm-dd hh24:mi:ss'),
+        #{YZXH,jdbcType=VARCHAR}
+		)
+	</insert>
+
+</mapper>

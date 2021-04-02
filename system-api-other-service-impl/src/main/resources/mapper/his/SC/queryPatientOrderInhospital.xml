@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+
+<mapper namespace="com.soft.api.mapper.his.SC.QueryPatientOrderInhospitalMapper">
+
+    <!--    查询预约住院病人信息-->
+    <select id="queryPatientOrderInhospital" parameterType="map" resultType="map">
+        select t2.BRID,
+        t2.BRXM,
+        case t2.brxb when 1 then '男'  when 2 then '女'  else '未知'  end as BRXB,
+        t2.BRXZ,
+        t1.JZKH,
+        t2.MZHM,
+        t2.YYKS as RYKSDM,
+        '' as CYKSDM,
+        t2.RYRQ,
+        t2.YYRQ,
+        (select ksmc from gy_ksdm where convert(VARCHAR(10),GY_KSDM.ksdm,120) = t2.YYKS) as RYKS,
+        '' as CYKS,
+        '' as ZDMC
+        from ms_brda t1, ZY_YYBR t2 ,YS_MZ_JZLS t3
+        <where>
+            t1.brid = t2.brid  and t2.BRID=t3.BRBH
+            and t2.zfbz=0
+            <if test="brid != null and brid != ''">
+                and t2.BRID = #{brid}
+            </if>
+            <if test="sfzh != null and sfzh != ''">
+                and t1.SFZH = #{sfzh}
+            </if>
+        </where>
+    </select>
+
+</mapper>

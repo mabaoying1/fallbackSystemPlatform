@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.his.shengguke.IPatientRegistryMapper">
+
+	<select id="getDefaultBRXZ" parameterType="map" resultType="map">
+		select CSZ from gy_xtcs t where t.CSMC = 'MRXZ' AND t.JGID = 1
+	</select>
+
+	<update id="updateYgpjBySyhm" parameterType="java.util.Map">
+		UPDATE MS_YGPJ SET MS_YGPJ.SYHM = #{MZHM}
+		Where JGID = #{JGID} AND PJLX = 3 AND YGDM = #{YGDM} AND LYRQ = to_date(#{LYRQ} , 'yyyy-MM-dd hh24:mi:ss')
+	</update>
+
+	<!--门诊号码系列  更新系统参数  -->
+	<update id="updateMzhmXtcs" parameterType="java.util.Map">
+		UPDATE GY_XTCS Set CSZ = #{XNGH} Where CSMC = 'ZDMZHXNGH' and JGID = 0
+	</update>
+
+	<!--门诊号码系列  新增员工票据  -->
+	<insert id="insertMzhmYgpj" parameterType="java.util.Map">
+		INSERT INTO MS_YGPJ(
+			JGID,YGDM,LYRQ,PJLX,
+			QSHM,ZZHM,SYHM,SYPB)
+		Values (
+		1, #{YGDM} , SYSDATE , 3 ,
+		(to_char(sysdate, 'yyMMdd') ||  #{XNGHS}) ,
+		(to_char(sysdate, 'yyMMdd') ||  #{XNGHE}) ,
+		(to_char(sysdate, 'yyMMdd') ||  #{XNGHS}) , 0)
+	</insert>
+
+	<!--门诊号码系列  更新员工票据  -->
+	<update id="updateMzhmYgpj" parameterType="java.util.Map">
+		UPDATE MS_YGPJ Set SYPB = 1 Where YGDM = #{YGDM} And PJLX = 3 And JGID = 1
+	</update>
+
+	<!--门诊号码新增系列  获取虚拟工号  -->
+	<select id="getMzhmXngh" parameterType="java.util.Map" resultType="Map">
+		select csz as XNGH from gy_xtcs where csmc like '%ZDMZHXNGH%'
+	</select>
+
+
+	<update id="updateYgpjBySypb" parameterType="java.util.Map">
+		UPDATE MS_YGPJ SET SYPB = 1
+			Where JGID = #{JGID} AND PJLX = 3 AND YGDM = #{YGDM} AND LYRQ = to_date(#{LYRQ}, 'yyyy-MM-dd hh24:mi:ss')
+	</update>
+
+	<select id="getZzhm" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT ZZHM FROM MS_YGPJ
+			Where JGID = #{JGID} AND YGDM = #{YGDM} AND PJLX = 3 AND SYPB = 0
+				AND SYHM &lt;= ZZHM AND LYRQ = to_date(#{LYRQ}, 'yyyy-MM-dd hh24:mi:ss')
+	</select>
+
+	<select id="getMzhm" parameterType="map" resultType="map">
+		SELECT SYHM MZHM FROM MS_YGPJ
+			Where JGID = #{JGID} AND YGDM = #{YGDM} AND PJLX = 3 AND LYRQ =  to_date(#{LYRQ}, 'yyyy-MM-dd hh24:mi:ss')
+	</select>
+
+
+	<select id="getLYRQ" parameterType="map" resultType="map">
+		SELECT min(LYRQ) LYRQ FROM MS_YGPJ
+			Where JGID = #{JGID} AND YGDM = #{YGDM} AND PJLX = 3 AND SYPB = 0 AND SYHM &lt;= ZZHM
+	</select>
+
+
+	<select id="getExistEmployeeByIDCard" parameterType="map" resultType="int">
+		SELECT COUNT(1)  From MS_BRDA Where sfzh = #{IdCard} and mzhm <![CDATA[ <> ]]>'住院登记'
+		<!-- And Exists (SELECT 1 From ms_brzh Where ms_brzh.zfpb = 0 And ms_brzh.brid = MS_BRDA.brid) -->
+		and ZXBZ = 0
+	</select>
+
+
+    <insert id="insertBrda" parameterType="map">
+		INSERT INTO ms_brda
+		(BRID,MZHM,BRXM,BRXB,CSNY,
+		HKDZ,JDJG,JDSJ,ZXBZ,JDR,XGSJ,JTDH,
+		BRXZ, XZZ_DH, JHRM, LXDH,
+		ZJLX, ZJHM, xzz_qtdz, lxrm, lxdz,   SFZH,
+		HEALTHID , SBHM)
+		VALUES(
+		#{BRID},#{MZHM},#{Name},#{Sex}, to_date(#{BirthDate},'yyyy-MM-dd hh24:mi:ss'),
+		#{Address,jdbcType=VARCHAR},#{JGID}, to_date(#{SystemTime},'yyyy-MM-dd hh24:mi:ss'),#{zxbz},#{jdr,jdbcType=VARCHAR},SYSDATE,#{PatientPhone,jdbcType=VARCHAR},
+		#{BRXZ},#{PatientPhone,jdbcType=VARCHAR},#{ContactPerson,jdbcType=VARCHAR},#{ContactPersonTel,jdbcType=VARCHAR},
+		#{IdCardCode},#{IdCard},#{Address,jdbcType=VARCHAR},#{ContactPerson,jdbcType=VARCHAR},#{Address,jdbcType=VARCHAR}, #{IdCard},
+		#{HEALTHID,jdbcType=VARCHAR},#{SBHM,jdbcType=VARCHAR})
+	</insert>
+
+	<insert id="insertKHBrda" parameterType="map">
+		insert into kh_brda (
+			brlb,brjb,jdry,jdrq,
+			jgid,brid,brxm,brxb,
+			csrq,sfzh,hkdz,jtdh)
+		values(
+			0, 1, #{jdr,jdbcType=VARCHAR}, to_date(#{SystemTime},'yyyy-MM-dd hh24:mi:ss'),
+			#{JGID}, #{BRID},#{Name},#{Sex},
+			TO_DATE(#{BirthDate},'yyyy-mm-dd hh24:mi:ss'),#{IdCard},#{Address,jdbcType=VARCHAR},#{PatientPhone,jdbcType=VARCHAR})
+	</insert>
+
+</mapper>

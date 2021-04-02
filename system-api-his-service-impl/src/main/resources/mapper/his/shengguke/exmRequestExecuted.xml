@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.his.shengguke.IExmRequestExecutedMapper">
+
+    <select id="isExc" parameterType="java.util.List" resultType="int">
+        select count(*) from MS_YJ01
+        where YJXH in
+        <foreach collection="list" item="item" index="index" open="("
+                 separator="," close=")">
+            #{item.YJXH}
+        </foreach>
+		and TJFL = 5
+		AND JGID = 1
+        AND ZXPB = 1
+    </select>
+
+    <select id="isZYExc" parameterType="java.util.List" resultType="int">
+        select count(*) from YJ_ZY01
+        <!-- where YJXH = #{YJXH} -->
+        where YJXH in
+        <foreach collection="list" item="item" index="index" open="("
+                 separator="," close=")">
+            #{item.YJXH}
+        </foreach>
+		AND JGID = 1
+        AND ZXPB = 1
+        and zfpb = 0
+    </select>
+
+
+
+    <!-- 检查医嘱执行 -->
+    <update id="updateMedicalOrderExecutionZY" parameterType="map">
+		update ZY_BQYZ
+		Set YJXH = #{YJXH},
+		QRSJ = to_date(#{ZXRQ},'yyyy-MM-dd HH24:mi:ss'),
+		SYBZ = 0,
+		LSBZ = 1
+		Where JLXH = #{YZXH}
+		And JGID = 1
+		and zfbz = 0
+	</update>
+
+    <!-- 住院医技执行 -->
+    <update id="updateExecutionDoctorZY" parameterType="map">
+		update YJ_ZY01
+		Set ZXPB = 1,
+		ZXRQ = to_date(#{ZXRQ},'yyyy-MM-dd HH24:mi:ss'),
+		ZXYS = #{ZXYS}
+		Where YJXH = #{YJXH}
+		And JGID = 1
+		and zfpb = 0
+	</update>
+
+    <!-- 计费插入 -->
+    <insert id="addExmPayBillZY" parameterType="java.util.List">
+        INSERT INTO ZY_FYMX
+        (JLXH,ZYH,FYRQ,FYXH,
+        FYMC,YPCD,FYSL,FYDJ,
+        ZJJE,ZFJE,YSGH,SRGH,
+        QRGH,FYBQ,FYKS,ZXKS,
+        JFRQ,XMLX,YPLX,FYXM,
+        JSCS,ZFBL,YZXH,ZLJE,
+        ZLXZ,JGID,TFGL,XMLXGLJLXH,
+        BRBQ)
+        <!-- oracle 批量插入不要 values 关键字 -->
+        <foreach collection="list" item="item" index="index"
+                 separator=" union all ">
+            (SELECT
+            #{item.JLXH},#{item.ZYH},#{item.FYRQ},#{item.FYXH},
+            #{item.FYMC},#{item.YPCD},#{item.FYSL},#{item.FYDJ},
+            #{item.ZJJE},#{item.ZFJE},#{item.YSGH},#{item.SRGH},
+            #{item.SRGH},#{item.FYBQ},#{item.FYKS},#{item.ZXKS},
+            #{item.JFRQ},#{item.XMLX},#{item.YPLX},#{item.FYXM},
+            #{item.JSCS},#{item.ZFBL},#{item.YZXH},#{item.ZLJE},
+            #{item.ZLXZ,jdbcType=NUMERIC},#{item.JGID},#{item.JLXH},#{item.XMLXGLJLXH},
+            #{item.BRBQ}
+            <!-- #{item.JLXH,jdbcType=NUMERIC},#{item.ZYH,jdbcType=NUMERIC},#{item.FYRQ},#{item.FYXH,jdbcType=NUMERIC}, -->
+            <!-- #{item.FYMC,jdbcType=VARCHAR},#{item.YPCD,jdbcType=VARCHAR},#{item.FYSL,jdbcType=VARCHAR},#{item.FYDJ,jdbcType=NUMERIC}, -->
+            <!-- #{item.ZJJE,jdbcType=VARCHAR},#{item.ZFJE,jdbcType=NUMERIC},#{item.YSGH,jdbcType=VARCHAR},#{item.SRGH,jdbcType=NUMERIC}, -->
+            <!-- #{item.QRGH,jdbcType=VARCHAR},#{item.FYBQ,jdbcType=NUMERIC},#{item.FYKS,jdbcType=VARCHAR},#{item.ZXKS,jdbcType=NUMERIC}, -->
+            <!-- #{item.JFRQ},#{item.XMLX,jdbcType=NUMERIC},#{item.YPLX,jdbcType=NUMERIC},#{item.FYXM,jdbcType=NUMERIC}, -->
+            <!-- #{item.JSCS,jdbcType=NUMERIC},#{item.ZFBL,jdbcType=NUMERIC},#{item.YZXH,jdbcType=NUMERIC},#{item.ZLJE,jdbcType=NUMERIC}, -->
+            <!-- #{item.ZLXZ,jdbcType=NUMERIC},#{item.JGID,jdbcType=NUMERIC},#{item.JLXH,jdbcType=NUMERIC},#{item.XMLXGLJLXH,jdbcType=NUMERIC}, -->
+            <!-- #{item.BRBQ,jdbcType=NUMERIC} -->
+            FROM DUAL)
+        </foreach>
+    </insert>
+
+    <!-- 计费参数查询 -->
+    <select id="queryExmRequestPayBillParaZY" parameterType="java.util.List"
+            resultType="java.util.Map">
+        select
+        da.zyh as ZYH,
+        yj.kdrq as FYRQ,
+        mx.ylxh as FYXH,
+        fy.fymc as FYMC,
+        0 as YPCD,
+        mx.ylsl as FYSL,
+        mx.yldj as FYDJ,
+        mx.yldj*mx.ylsl as ZJJE,
+        mx.yldj*mx.ylsl*mx.zfbl as ZFJE,
+        yj.ysdm as YSGH,
+        yj.fybq as FYBQ,
+        yj.ksdm as FYKS,
+        yj.zxks as ZXKS,
+        sysdate as JFRQ,
+        3 as XMLX,
+        0 as YPLX,
+        mx.fygb as FYXM,
+        0 as JSCS,
+        mx.zfbl as ZFBL,
+        mx.yzxh as YZXH,
+        0 as ZLJE,
+        da.zlxz as ZLXZ,
+        1 as JGID,
+        0 as XMLXGLJLXH,
+        yj.fybq as BRBQ
+        from yj_zy01 yj join yj_zy02 mx on yj.yjxh=mx.yjxh
+        join GY_YLSF fy on mx.ylxh=fy.fyxh
+        join zy_brry da on yj.zyh = da.zyh
+        where yj.yjxh in
+        <foreach collection="list" item="item" index="index" open="("
+                 separator="," close=")">
+            #{item.YJXH}
+        </foreach>
+    </select>
+
+    <delete id="deleteExmYjxhZY" parameterType="java.util.List">
+        DELETE From YJ_BG01
+        Where YJXH in
+        <foreach collection="list" item="item" index="index" open="("
+                 separator="," close=")">
+            #{item.YJXH}
+        </foreach>
+        And MZZY = 2
+        And JGID = 1
+    </delete>
+
+    <insert id="addMedicalOrderExecutionZY" parameterType="java.util.List">
+        INSERT INTO YJ_BG01_JJHS
+        (JLXH,JGID,YJXH,MBXH,
+        MZZY,BRHM,BRXM,BRXB,
+        BRNL,SJYS,SJKS,JCYS,
+        JCKS,JCRQ,XMXH,XMMC,
+        HJJE,QXZX,YJZX,YJSBXH,ZYH)
+        <!-- oracle 批量插入不要 values 关键字 -->
+        <foreach collection="list" item="item" index="index"
+                 separator=" union all ">
+            (SELECT
+            #{item.JLXH,jdbcType=NUMERIC},#{item.JGID,jdbcType=NUMERIC},#{item.YJXH,jdbcType=NUMERIC},#{item.MBXH,jdbcType=NUMERIC},
+            #{item.MZZY,jdbcType=NUMERIC},#{item.BRHM,jdbcType=VARCHAR},#{item.BRXM,jdbcType=VARCHAR},#{item.BRXB,jdbcType=VARCHAR},
+            #{item.BRNL,jdbcType=NUMERIC},#{item.SJYS,jdbcType=VARCHAR},#{item.SJKS,jdbcType=NUMERIC},#{item.JCYS,jdbcType=VARCHAR},
+            #{item.JCKS,jdbcType=NUMERIC},to_date(#{item.JCRQ},'yyyy-MM-dd
+            HH24:mi:ss'),#{item.XMXH,jdbcType=NUMERIC},#{item.XMMC,jdbcType=VARCHAR},
+            #{item.HJJE,jdbcType=NUMERIC},#{item.QXZX,jdbcType=NUMERIC},#{item.YJZX,jdbcType=NUMERIC},#{item.YJSBXH,jdbcType=NUMERIC},
+            #{item.ZYH,jdbcType=NUMERIC}
+            FROM DUAL)
+        </foreach>
+    </insert>
+
+    <select id="queryMedicalOrderExecutionParaZY" parameterType="java.util.List"
+            resultType="java.util.HashMap">
+        select
+        1 as JGID,
+        yj.YJXH as YJXH,
+        1 as MBXH,
+        2 as MZZY,
+        da.zyhm as BRHM,
+        da.BRXM as BRXM,
+        da.brxb as BRXB,
+        ceil((sysdate - da.csny)/365) as BRNL,
+        yj.ysdm as SJYS,
+        yj.ksdm as SJKS,
+        yj.zxks as JCKS,
+        fy.fyxh as XMXH,
+        fy.fymc as XMMC,
+        (mx.yldj*mx.ylsl*mx.zfbl) as HJJE,
+        1 as QXZX,
+        mx.YJZX as YJZX,
+        mx.sbxh as YJSBXH,
+        da.zyh as ZYH
+        from yj_zy01 yj join yj_zy02 mx on yj.yjxh=mx.yjxh
+        join GY_YLSF fy on mx.ylxh=fy.fyxh
+        join zy_brry da on yj.zyh = da.zyh
+        where yj.yjxh in
+        <foreach collection="list" item="item" index="index" open="("
+                 separator="," close=")">
+            #{item.YJXH}
+        </foreach>
+    </select>
+
+    <!--住院sql 开始 -->
+    <select id="getYjxhsZY" parameterType="map" resultType="java.util.Map">
+        select distinct yj.yjxh as YJXH,yj.sqdh as SQDH, mx.yzxh as YZXH,
+        mx.zlxmid as ZLXMID
+        from
+        yj_zy01 yj join yj_zy02 mx on yj.yjxh=mx.yjxh
+        where
+        yj.yjxh=mx.yjxh
+        and yj.sqdh= #{ExmRequest.RequestId}
+        and mx.zlxmid in
+        <foreach collection="ITEMCODES" item="item" index="index"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and yj.zfpb = 0
+    </select>
+
+    <update id="updateExecutionDoctor" parameterType="map">
+		update MS_YJ01
+		Set ZXPB = 1,
+		ZXRQ = to_date(#{ZXRQ},'yyyy-MM-dd HH24:mi:ss'),
+		HJGH =
+		#{HJGH},
+		ZXYS = #{HJGH}
+		Where YJXH = #{YJXH,jdbcType=NUMERIC}
+		and TJFL=5
+		AND JGID = 1
+	</update>
+
+    <!-- 门诊/住院共用 -->
+    <insert id="addExmRequestPayBill" parameterType="map">
+		INSERT INTO
+		YJ_BG01
+		(JGID,YJXH,MBXH,MZZY,
+		BRHM,BRXM,BRXB,
+		BRNL,SJYS,SJKS,JCYS,
+		JCKS,JCRQ,XMXH,XMMC,
+		HJJE,ZYH)
+		VALUES
+		(
+		#{JGID,jdbcType=NUMERIC},#{YJXH,jdbcType=NUMERIC},#{MBXH,jdbcType=NUMERIC},#{MZZY,jdbcType=NUMERIC},
+		#{BRHM,jdbcType=VARCHAR},#{BRXM,jdbcType=VARCHAR},#{BRXB,jdbcType=VARCHAR},
+		#{BRNL,jdbcType=NUMERIC},#{SJYS,jdbcType=VARCHAR},#{SJKS,jdbcType=NUMERIC},#{JCYS,jdbcType=VARCHAR},
+		#{JCKS,jdbcType=NUMERIC},to_date(#{JCRQ},'yyyy-MM-dd
+		HH24:mi:ss'),#{XMXH,jdbcType=NUMERIC},#{XMMC,jdbcType=VARCHAR},
+		#{HJJE,jdbcType=NUMERIC},#{ZYH,jdbcType=NUMERIC}
+		)
+	</insert>
+
+    <delete id="deleteExmYjxh" parameterType="map">
+		DELETE From YJ_BG01
+		Where YJXH = #{YJXH}
+		And MZZY = 1
+		AND JGID = 1
+	</delete>
+
+    <!-- 插入经济核算表 -->
+    <insert id="addExmRequestPayBillD" parameterType="java.util.List">
+        insert into YJ_BG01_JJHS
+        (JGID,YJXH,MBXH,MZZY,
+        BRHM,BRXM,BRXB,BRNL,
+        SJYS,SJKS,JCYS,JCKS,
+        JCRQ,XMXH,XMMC,HJJE,
+        QXZX,JLXH,YJZX,YJSBXH,ZYH)
+        <!-- oracle 批量插入不要 values 关键字 -->
+        <foreach collection="list" item="item" index="index"
+                 separator=" union all ">
+            (SELECT
+            #{item.JGID,jdbcType=NUMERIC},#{item.YJXH,jdbcType=NUMERIC},#{item.MBXH,jdbcType=NUMERIC},#{item.MZZY,jdbcType=NUMERIC},
+            #{item.BRHM,jdbcType=VARCHAR},#{item.BRXM,jdbcType=VARCHAR},#{item.BRXB,jdbcType=VARCHAR},#{item.BRNL,jdbcType=NUMERIC},
+            #{item.SJYS,jdbcType=VARCHAR},#{item.SJKS,jdbcType=NUMERIC},#{item.JCYS,jdbcType=VARCHAR},#{item.JCKS,jdbcType=NUMERIC},
+            to_date(#{item.JCRQ},'yyyy-MM-dd
+            HH24:mi:ss'),#{item.XMXH,jdbcType=NUMERIC},#{item.XMMC,jdbcType=VARCHAR},#{item.HJJE,jdbcType=NUMERIC},
+            #{item.QXZX,jdbcType=NUMERIC},#{item.JLXH,jdbcType=NUMERIC},#{item.YJZX,jdbcType=NUMERIC},#{item.YJSBXH,jdbcType=NUMERIC},
+            #{item.ZYH,jdbcType=NUMERIC}
+            FROM DUAL)
+        </foreach>
+    </insert>
+
+    <!-- 查询申请单支付相关参数 -->
+    <select id="queryExmRequestPayBillDParam" parameterType="map"
+            resultType="java.util.Map">
+        select
+        1 as JGID,
+        yj.YJXH as YJXH,
+        1 as MBXH,
+        1 as MZZY,
+        da.mzhm as BRHM,
+        da.BRXM
+        as BRXM,
+        da.brxb as BRXB,
+        ceil((sysdate - da.csny)/365) as BRNL,
+        yj.ysdm
+        as SJYS,
+        yj.ksdm as SJKS,
+        yj.zxks as JCKS,
+        fy.fyxh as XMXH,
+        fy.fymc as XMMC,
+        mx.hjje as HJJE,
+        1 as QXZX,
+        mx.YJZX as
+        YJZX,
+        mx.sbxh as YJSBXH,
+        Null as ZYH
+        from ms_yj01 yj join ms_yj02 mx on
+        yj.yjxh=mx.yjxh
+        join GY_YLSF fy on
+        mx.ylxh=fy.fyxh
+        join ms_brda da on
+        yj.brid = da.brid
+        where yj.yjxh= #{YJXH}
+    </select>
+
+    <update id="updateJczt" parameterType="map">
+		UPDATE EMR_JCSQ SET JCZT = 3 Where SQDH = #{SQDH}
+	</update>
+
+    <!-- 判断检查项目是否执行 如果返回> 1 则执行updateJczt -->
+    <select id="projectIsExecution" parameterType="map" resultType="int">
+		select count(1) as jcsl from EMR_JCXM where SQDH = #{SQDH} and jczt = 1
+	</select>
+
+    <!-- 【更新检查项目执行状态】 -->
+    <update id="updateExecutionStatus" parameterType="map">
+		UPDATE EMR_JCXM SET JCZT = 3 Where SQDH = #{SQDH} AND ZLXMID = #{ZLXMID}
+	</update>
+
+    <select id="getYjxhs" parameterType="map" resultType="java.util.Map">
+        select sq.sqdh as SQDH, xm.zlxmid as ZLXMID, xm.yzxh as YJXH from
+        emr_jcsq sq join emr_jcxm xm on sq.sqdh=xm.sqdh
+        where sq.sqdh=
+        #{ExmRequest.RequestId}
+        and xm.zlxmid in
+        <foreach collection="ITEMCODES" item="item" index="index"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 判断是门诊还是住院 -->
+    <select id="getMzOrZy" resultType="map">
+		select  jzlx as MZZY from
+		emr_jcsq where sqdh=#{ExmRequest.RequestId}
+	</select>
+    <!-- 获取诊疗小组-->
+    <select id="getNewZlxz" parameterType="map" resultType="java.lang.Integer">
+		select NVL(MAX(a.xzxh),0) as zlxz from emr_wh_ysxzqx a,emr_wh_zlxz b
+		where a.ysdm= #{YSGH} and a.xzxh =b.xzxh and b.ksdm = #{ZXKS}
+	</select>
+    <select id="getMinZlxz" parameterType="map" resultType="java.lang.Integer">
+        select nvl(min(xzxh),0) as zlxz from emr_wh_ysxzqx where ysdm =#{YSGH}
+	</select>
+</mapper>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+
+<mapper namespace="com.soft.api.mapper.his.SC.QueryPatientInfoMapper">
+
+    <select id="queryPatientInfo" parameterType="map" resultType="map">
+        select
+        BRID ,BRXM,BRXZ,JZKH,ZYHM,
+        BRXB,ISNULL(lxdh,jtdh) as HZDH,
+        CSNY,JGDM,MZDM ,GJDM ,
+        DWBH ,DWDH ,GZDW ,HKDZ ,
+        LXRM,LXGX,LXDZ,LXDH
+        from zy_brry
+        <where>
+            <if test="brid != null and brid != ''">
+                and brid = #{brid}
+            </if>
+            <if test="zyhm != null and zyhm != ''">
+                and zyhm = #{zyhm}
+            </if>
+            <if test="sfzh != null and sfzh != ''">
+                and sfzh = #{sfzh}
+            </if>
+            <if test="jzkh != null and jzkh != ''">
+                and jzkh = #{jzkh}
+            </if>
+            <if test="brxm != null and brxm != ''">
+                and brxm = #{brxm}
+            </if>
+        </where>
+    </select>
+
+</mapper>

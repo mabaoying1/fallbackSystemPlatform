@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.portal.shengguke.IPatientRegistryMapper">
+
+
+	<insert id="addGyBrdaPortal" parameterType="Map">
+		insert into gy_brda (
+			jdr, jdsj, jdjg, brid,
+			brxm,brxz,brxb,csny,
+			zxbz,xgsj,hkdz,mzhm,
+			sfzh, jtdh, jhrm)
+		values(
+			#{jdr,jdbcType=VARCHAR}, TO_DATE(#{SystemTime},'yyyy-mm-dd hh24:mi:ss'), #{JGID}, #{BRID},
+			#{Name}, #{BRXZ}, #{Sex}, TO_DATE(#{BirthDate},'yyyy-mm-dd hh24:mi:ss'),
+			#{zxbz}, sysdate, #{Address,jdbcType=VARCHAR},#{MZHM},
+			#{IdCard},#{PatientPhone,jdbcType=VARCHAR},#{ContactPerson,jdbcType=VARCHAR})
+	</insert>
+
+</mapper>

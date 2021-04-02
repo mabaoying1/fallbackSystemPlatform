@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.his.shengguke.ILisOperateRelateMapper">
+	<insert id="test" parameterType="map">
+		insert into test (id,sex)values(#{id},#{sex})
+	</insert>
+
+
+	<select id="getZYBQYZCount" parameterType="map" resultType="int">
+		select count(*) from zy_bqyz where zfbz = 0 and jlxh = #{YZXH} and ZYH = #{ZYH}
+	</select>
+
+
+    <!-- 住院检验计费 -->
+    <insert id="addZYLabRequestPayBill" parameterType="java.util.List">  <!-- parameterType="map" -->
+        INSERT INTO ZY_FYMX
+        (JLXH,ZYH,FYRQ,JFRQ,
+        FYKS,FYBQ,ZXKS,
+        FYXH,FYMC,
+        FYXM,XMLX,YPLX,YPCD,
+        FYSL,FYDJ,ZFBL,ZJJE,
+        ZFJE,ZLJE,SRGH,
+        QRGH,YSGH,YZXH,JSCS,
+        ZLXZ,JGID,TFGL,XMLXGLJLXH)
+        <!-- oracle 批量插入不要	values 关键字 -->
+        <foreach collection="list" item="item" index="index" separator =" union all ">
+            (SELECT #{item.JLXH,jdbcType=NUMERIC},#{item.ZYH,jdbcType=NUMERIC},
+            to_date(#{item.FYRQ},'yyyy-mm-dd HH24:mi:ss'),to_date(#{item.JFRQ},'yyyy-mm-dd HH24:mi:ss'),
+            #{item.FYKS,jdbcType=NUMERIC},#{item.FYBQ,jdbcType=NUMERIC},#{item.ZXKS,jdbcType=NUMERIC},
+            #{item.FYXH,jdbcType=NUMERIC},#{item.FYMC,jdbcType=VARCHAR},
+            #{item.FYXM,jdbcType=NUMERIC},#{item.XMLX,jdbcType=NUMERIC},#{item.YPLX,jdbcType=NUMERIC},#{item.YPCD,jdbcType=NUMERIC},
+            #{item.FYSL,jdbcType=NUMERIC},#{item.FYDJ,jdbcType=NUMERIC},#{item.ZFBL,jdbcType=NUMERIC},#{item.ZJJE,jdbcType=NUMERIC},
+            #{item.ZFJE,jdbcType=NUMERIC},#{item.ZLJE,jdbcType=NUMERIC},#{item.SRGH,jdbcType=VARCHAR},
+            #{item.QRGH,jdbcType=VARCHAR},#{item.YSGH,jdbcType=VARCHAR},#{item.YZXH,jdbcType=NUMERIC},#{item.JSCS,jdbcType=NUMERIC},
+            #{item.ZLXZ,jdbcType=NUMERIC},#{item.JGID,jdbcType=NUMERIC},#{item.TFGL,jdbcType=NUMERIC},#{item.XMLXGLJLXH,jdbcType=NUMERIC}
+            FROM DUAL)
+        </foreach>
+    </insert>
+
+    <update id="updateMedicalOrderExecutionStatus" parameterType="map">
+		update zy_bqyz
+		set sybz = 0, lsbz = 1, qrsj = sysdate
+		where jlxh = #{YZXH}
+	</update>
+
+    <select id="getYZXH" parameterType="java.util.Map"
+            resultType="java.lang.String">
+        select jlxh as  YZXH from zy_bqyz where sqid = #{REQUESTID} and zfbz=0
+        <if test="YSYZBH != null">
+            and  ysyzbh = #{YSYZBH,jdbcType=NUMERIC}
+        </if>
+        <if test="FYXH != null and FYXH != '' ">
+			and YPXH = #{FYXH}
+		</if>
+        and YPCD = 0
+    </select>
+
+    <select id="getZlxz" parameterType="map" resultType="java.lang.Integer">
+		select
+		nvl(zlxz, 0) as ZLXZ from zy_brry where zyh = #{ZYH}
+	</select>
+
+    <select id="getZfbl" parameterType="map" resultType="String">
+		SELECT
+		nvl(ZYZFBL, 100)/100 as ZFBL
+		FROM GY_ZFBL
+		where sfxm = #{FYXM}
+		and brxz = #{BRXZ}
+	</select>
+
+    <select id="getFyxm" parameterType="map" resultType="String">
+		select fygb as FYXM from gy_ylsf where fyxh = #{FYXH}
+	</select>
+
+	<!-- 门诊 -->
+	<update id="updateMzZxbz" parameterType="map">
+		update ms_yj01 set zxrq= to_date(#{ExeDateTime_TEXT},'yyyy-mm-dd HH24:mi:ss') ,zxys= #{EXEDOCTOR_TEXT}, zxpb=1 where
+		tjfl=4 and sqid= #{RequestId}
+	</update>
+
+	<update id="updateExecutionSign" parameterType="map">
+		update zy_bqyz
+		set sybz = 0, lsbz = 0, qrsj = Null
+		where jlxh in
+		<foreach collection="YZXHS" item="item" index="index" open = "(" separator= "," close=")" >
+			#{item}
+		</foreach>
+		and zfbz = 0
+	</update>
+
+	<update id="updateYtsl" parameterType="map">
+		update zy_fymx
+		set ytsl = fysl
+		where jlxh = #{TFGL}
+	</update>
+
+	<insert id="addLabBarcodeCreateCancel" parameterType="map">
+		INSERT INTO
+		ZY_FYMX
+		(JLXH,ZYH,FYRQ,JFRQ,FYKS,
+		FYBQ,ZXKS,FYXH,FYMC,FYXM,XMLX,YPLX,
+		YPCD,FYSL,FYDJ,ZFBL,ZJJE,ZFJE,ZLJE,
+		SRGH,QRGH,YSGH,YZXH,JSCS,
+		ZLXZ,JGID,TFGL,XMLXGLJLXH)
+		VALUES
+		(#{JLXH},#{ZYH},#{FYRQ},#{JFRQ},#{FYKS},
+		#{FYBQ},#{ZXKS},#{FYXH},#{FYMC},#{FYXM},#{XMLX},#{YPLX},
+		#{YPCD},#{FYSL},#{FYDJ},#{ZFBL},#{ZJJE},#{ZFJE},#{ZLJE},
+		#{SRGH,jdbcType=VARCHAR},#{QRGH,jdbcType=VARCHAR},#{YSGH},#{YZXH},#{JSCS},
+		#{ZLXZ},#{JGID},#{TFGL},#{XMLXGLJLXH,jdbcType=NUMERIC})
+	</insert>
+
+    <select id="queryAddPara" parameterType="map" resultType="java.util.Map">
+		select ZYH,FYRQ,sysdate as JFRQ,FYKS,FYBQ,ZXKS,
+		FYXH,FYMC,FYXM,XMLX,YPLX,YPCD,
+		-1 * FYSL as FYSL,	FYDJ,ZFBL,	-1 * ZJJE as ZJJE, -1 * ZFJE as ZFJE,
+		ZLJE,SRGH,QRGH,YSGH,YZXH,JSCS,ZLXZ,
+		JGID,TFGL,XMLXGLJLXH
+		from zy_fymx
+		where zyh = #{ZYH}
+		and fyxh = #{FYXH}
+		and yzxh = #{YZXH}
+		and xmlx = 6
+		and fysl - ytsl &gt; 0
+	</select>
+
+    <select id="queryCYPB" parameterType="java.lang.Object" resultType="int">
+		select count(1) as cyzt
+		from zy_brry
+		where zyh = #{ZYH}
+		and cypb &gt; 2
+	</select>
+	<select id="getNewZlxz" parameterType="map" resultType="java.lang.Integer">
+		select NVL(MAX(a.xzxh),0) as zlxz from emr_wh_ysxzqx a,emr_wh_zlxz b
+		where a.ysdm= #{YSGH} and a.xzxh =b.xzxh and b.ksdm = #{ZXKS}
+	</select>
+	<select id="getMinZlxz" parameterType="map" resultType="java.lang.Integer">
+        select nvl(min(xzxh),0) as zlxz from emr_wh_ysxzqx where ysdm =#{YSGH}
+	</select>
+
+	<update id="cancelExecutionSign" parameterType="list">
+		update ms_yj01 set zxrq = Null,zxys = Null ,zxpb = 0
+		where tjfl = 4 and sqid
+		in
+		<foreach collection="list" item="item" index="index" open = "(" separator= "," close=")" >
+			#{item.REQUESTID}
+		</foreach>
+    </update>
+
+	<update id="cancelMSYJExecutionSign" parameterType="map">
+		update ms_yj01 set zxrq = Null,zxys = Null ,zxpb = 0
+		where tjfl = 4 and sqid = #{REQUESTID} and yjxh = #{YJXH}
+	</update>
+
+
+</mapper>

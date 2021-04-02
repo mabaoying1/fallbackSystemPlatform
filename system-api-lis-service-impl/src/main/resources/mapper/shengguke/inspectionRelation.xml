@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.shengguke.IInspectionRelationMapper">
+
+	<insert id="test" parameterType="map">
+		insert into test (id,name)values(#{id},#{name})
+	</insert>
+
+
+	<select id="getSQDMXOVCount" parameterType="map" resultType="int">
+		select
+		count(*)
+		from
+		l_lis_sqdmx where zxpb = 1 and doctrequestno = #{REQUESTID}
+	</select>
+
+
+	<select id="getBarCodeByStatus" parameterType="map" resultType="int">
+		select
+		count(distinct doctadviseno)
+		from l_jytmxx
+		where doctrequestno = #{DOCTREQUESTNO} and SAMPLESTATUS = 3
+	</select>
+
+	<select id="getBarCodeByReqStatus" parameterType="map" resultType="int">
+		select
+		count(distinct doctadviseno)
+		from l_jytmxx
+		where doctrequestno = #{DOCTREQUESTNO}
+	</select>
+
+	<select id="getReqByBarCode" parameterType="map" resultType="map">
+		 select distinct doctrequestno as DOCTREQUESTNO  from l_jytmxx where doctadviseno = #{DOCTADVISENO}
+	</select>
+
+	<select id="getSQDMXZXPBCount" parameterType="map" resultType="int">
+		select count (*) from l_lis_sqdmx
+		where DOCTREQUESTNO = #{REQUESTID} and zxpb = 1
+	</select>
+
+	<select id="isJytmxx" parameterType="map" resultType="map">
+		select STAYHOSPITALMODE , JZXH as ZYH from l_jytmxx t where doctadviseno = #{doctadviseno}
+	</select>
+
+
+	<select id="getJytmxxCount" parameterType="map" resultType="int">
+		<!-- select count(*) from l_jytmxx t where t.doctrequestno =
+		(select t.doctrequestno from l_jytmxx t where t.doctadviseno = #{DOCTADVISENO})
+		and t.SAMPLESTATUS not in (0,2,3) -->
+		select count(*) from l_jytmxx t
+		where t.doctrequestno = #{REQUESTID}
+		and t.doctadviseno = #{DOCTADVISENO}
+		and t.SAMPLESTATUS not in (0,2,3)
+	</select>
+
+	<delete id="deleteJYTMXX" parameterType="map">
+		delete from l_jytmxx where doctadviseno = #{DOCTADVISENO}
+	</delete>
+
+	<delete id="deleteJYTMXXMX" parameterType="map">
+		delete from l_jytmxx_mx where doctadviseno = #{DOCTADVISENO}
+	</delete>
+
+    <update id="updateJYTMXXSampleStatus" parameterType="map">
+        update l_jytmxx set SAMPLESTATUS = 3
+        where doctadviseno = #{DOCTADVISENO}
+    </update>
+
+
+	<select id="getSQDIDByBarCode" parameterType="map" resultType="map">
+		select DOCTREQUESTNO from l_jytmxx_mx t where t.doctadviseno = #{doctadviseno}
+	</select>
+
+
+	<select id="getSQDExcStatus" parameterType="map" resultType="int">
+		select count(*) from l_lis_sqd where sqdstatus = 4 and
+		doctrequestno in
+		<foreach collection="LabBarcode.LabRequest" item="request" index="index" open = "(" separator= " , " close=")" >
+			#{request.RequestId}
+		</foreach>
+	</select>
+
+	<update id="updateSqdstatus" parameterType="map">
+		update l_lis_sqd set sqdstatus = 4
+		where
+		doctrequestno in
+		<foreach collection="LabBarcode.LabRequest" item="request" index="index" open = "(" separator= " , " close=")" >
+			#{request.RequestId}
+		</foreach>
+	</update>
+
+	<update id="updateJLXH1" parameterType="java.util.HashMap">
+		update l_lis_sqdmx set jlxh=#{JLXH,jdbcType=NUMERIC} where  ysyzbh =#{YSYZBH,jdbcType=NUMERIC}
+		and doctrequestno = #{REQUESTID}
+		and exists (select * from l_lis_sqd
+        where doctrequestno = #{REQUESTID} and stayhospitalmode = 2)
+	</update>
+
+	<insert id="addLabBarcodeCreateD" parameterType="map">
+		insert into
+		l_jytmxx_mx
+		(DOCTADVISENO,JLXH,YLXH,YLMC,DJ,SL,FEESTATUS,
+		SAMPLETYPE,PREHYID,DOCTREQUESTNO,YJXH,HYID,YZXH,TMXH)
+		VALUES
+		(#{DOCTADVISENO,jdbcType=VARCHAR},#{JLXH,jdbcType=NUMERIC},#{YLXH,jdbcType=NUMERIC},#{YLMC,jdbcType=VARCHAR},#{DJ,jdbcType=NUMERIC},#{SL,jdbcType=NUMERIC},#{FEESTATUS,jdbcType=NUMERIC},
+		#{SAMPLETYPE,jdbcType=VARCHAR},#{PREHYID,jdbcType=NUMERIC},#{DOCTREQUESTNO,jdbcType=VARCHAR},#{YJXH,jdbcType=NUMERIC},#{HYID,jdbcType=NUMERIC},#{YZXH,jdbcType=NUMERIC},#{TMXH,jdbcType=NUMERIC})
+	</insert>
+
+	<select id="queryLabBarcodeCreateDParam" parameterType="map" resultType="map">
+		select jlxh as JLXH,ysyzbh as YSYZBH,ylxh as YLXH,ylmc as YLMC,dj as DJ,sl as
+		SL,feestatus as FEESTATUS,
+		sampletype as SAMPLETYPE,prehyid as PREHYID,doctrequestno as DOCTREQUESTNO,yjxh as YJXH,hyid as HYID,
+		ysyzbh as YZXH,doctrequestno as REQUESTID
+		from l_lis_sqdmx
+		where
+		<foreach collection="LabBarcode.LabRequest" item="request" index="index" open = "" separator= " or " close="" >
+			( doctrequestno = #{request.RequestId} and prehyid in
+			<foreach collection="ITEMCODE_TEXT" item="item" index="index" open = "(" separator= "," close=")" >
+				#{item}
+			</foreach>)
+		</foreach>
+	</select>
+
+
+	<select id="queryLabBarcodeCreateDParamNew" parameterType="map" resultType="map">
+		select jlxh as JLXH, ysyzbh as YSYZBH,ylxh as YLXH,ylmc as YLMC,dj as DJ,sl as
+		SL,feestatus as FEESTATUS,
+		sampletype as SAMPLETYPE,prehyid as PREHYID,doctrequestno as DOCTREQUESTNO,yjxh as YJXH,hyid as HYID,
+		ysyzbh as YZXH,doctrequestno as REQUESTID
+		from l_lis_sqdmx
+		where
+		<foreach collection="RequestList" item="request" index="index" open = "" separator= " or " close="" >
+			( doctrequestno = #{request.RequestId} and prehyid = #{request.ItemCode} )
+		</foreach>
+	</select>
+
+
+	<select id="getFee" parameterType="map" resultType="java.lang.Double">
+		select sum(dj * sl) as Fee
+		from l_lis_sqdmx
+		where
+		<foreach collection="LabBarcode.LabRequest" item="request" index="index" open = "" separator= " or " close="" >
+			( doctrequestno = #{request.RequestId} and prehyid in
+			<foreach collection="ITEMCODE_TEXT" item="item" index="index" open = "(" separator= "," close=")" >
+				#{item}
+			</foreach>)
+		</foreach>
+	</select>
+
+	<select id="queryLabBarcodeCreateParam" parameterType="map"
+			resultType="java.util.Map">
+		select
+		jzxh as JZXH,
+		1 as SAMPLESTATUS,
+		requester AS REQUESTER,
+		requesttime AS REQUESTTIME,
+		section AS SECTION,
+		bed_no AS BED_NO,
+		stayhospitalmode AS STAYHOSPITALMODE,
+		brxz AS BRXZ,
+		patientid AS PATIENTID,
+		fphm AS FPHM,
+		patientname AS PATIENTNAME,
+		sex AS SEX,
+		birthday AS BIRTHDAY,
+		age AS AGE,
+		age_unit AS AGE_UNIT,
+		1 as FEESTATUS,
+		diagnostic AS DIAGNOSTIC,
+		doctrequestno AS DOCTREQUESTNO,
+		requestmode AS REQUESTMODE,
+		brid AS BRID,
+		sfzh AS SFZH,
+		lxdh AS LXDH,
+		zdxh AS ZDXH,
+		bqdm as BRBQ
+		from
+		l_lis_sqd
+		where doctrequestno = #{LabBarcode.LabRequest[0].RequestId}
+	</select>
+
+	<select id="getLjytmxxPrehyid" parameterType="map" resultType="map">
+		select distinct prehyid as PREHYID from l_jytmxx_mx t
+		where t.doctadviseno = #{doctadviseno}
+	</select>
+
+	<update id="updateBarCodeBillingMark" parameterType="map">
+		update l_jytmxx_mx
+		set feestatus = 2
+		where
+		doctadviseno = #{doctadviseno}
+		<!--DOCTREQUESTNO = #{RequestId} 现在按条码号来收费 -->
+		<if test="ITEMCODE_TEXT != null">
+			and prehyid in
+			<foreach collection="ITEMCODE_TEXT" item="item" index="index" open = "(" separator= "," close=")" >
+				#{item}
+			</foreach>
+		</if>
+		and feestatus = 1
+	</update>
+
+	<update id="updateBarCodeBillingMarkCancel" parameterType="map">
+		update l_jytmxx_mx
+		set feestatus = 1
+		where
+		doctadviseno = #{doctadviseno}
+		<!--DOCTREQUESTNO = #{RequestId} -->
+		<if test="ITEMCODE_TEXT != null">
+			and prehyid in
+			<foreach collection="ITEMCODE_TEXT" item="item" index="index" open = "(" separator= "," close=")" >
+				#{item}
+			</foreach>
+		</if>
+		and feestatus = 2
+	</update>
+
+
+	<update id="updateApplicationBillingMark" parameterType="map">
+		update l_lis_sqdmx
+		set feestatus = 2 ,zxpb = 1
+		where DOCTREQUESTNO = #{RequestId}
+		<if test="PREHYID != null">
+			and prehyid = #{PREHYID}
+		</if>
+		<if test="YLXH != null">
+			and YLXH = #{YLXH}
+		</if>
+		<if test="ITEMCODE_TEXT != null">
+			and prehyid in
+			<foreach collection="ITEMCODE_TEXT" item="item" index="index" open = "(" separator= "," close=")" >
+				#{item}
+			</foreach>
+		</if>
+		and feestatus = 1
+	</update>
+
+
+	<select id="queryLabRequestPayBillZYByBarCode" parameterType="map"
+			resultType="java.util.Map">
+		select
+    tmxx.jzxh as ZYH,
+    tmxx.requesttime as FYRQ,
+    sysdate as JFRQ,
+    tmxx.section as FYKS,
+    tmxx.brbq as FYBQ,
+    mx.ylxh as FYXH,
+    mx.ylmc as FYMC,
+    6 as XMLX,
+    0 as YPLX,
+    (select CSZ1 from gy_xtcs where csmc = 'JYK_KSDM') as ZXKS,
+    0 as YPCD,
+    mx.sl as FYSL,
+    mx.dj as FYDJ,
+    (mx.sl * mx.dj) as ZJJE,
+    0 as ZLJE,
+    tmxx.requester as YSGH,
+    mx.jlxh as YZXH,
+    mx.yzxh as YSYZBH,
+    0 as JSCS,
+    0 as XMLXGLJLXH,
+    1 as JGID,
+    tmxx.brxz as BRXZ,
+    mx.doctrequestno as REQUESTID,
+    mx.PREHYID as PREHYID,
+    mx.YLXH as YLXH
+    from l_jytmxx  tmxx
+    join l_jytmxx_mx mx on  tmxx.doctadviseno = mx.doctadviseno
+    where tmxx.doctadviseno = #{doctadviseno}
+    and mx.feestatus = 1
+    and tmxx.stayhospitalmode = 2
+	</select>
+
+
+	<select id="queryLabRequestPayBillZY" parameterType="map"
+			resultType="java.util.Map">
+		select
+		sqd.jzxh as ZYH,
+		sqd.requesttime as FYRQ,
+		sysdate as JFRQ,
+		sqd.section as FYKS,
+		sqd.bqdm as FYBQ,
+		mx.ylxh as FYXH,
+		mx.ylmc as FYMC,
+		6 as XMLX,
+		0 as YPLX,
+		(select CSZ1 from gy_xtcs where csmc = 'JYK_KSDM') as ZXKS,
+		0 as YPCD,
+		mx.sl as FYSL,
+		mx.dj as FYDJ,
+		(mx.sl * mx.dj) as ZJJE,
+		0 as ZLJE,
+		sqd.requester as YSGH,
+		mx.jlxh as YZXH,
+		mx.ysyzbh as YSYZBH,
+		0 as JSCS,
+		0 as XMLXGLJLXH,
+		1 as JGID,
+		sqd.brxz as BRXZ
+		from l_lis_sqd sqd
+		join l_lis_sqdmx mx on sqd.doctrequestno = mx.doctrequestno
+		where mx.DOCTREQUESTNO = #{RequestId}
+		<if test="ITEMCODE_TEXT != null">
+			and mx.prehyid in
+			<foreach collection="ITEMCODE_TEXT" item="item" index="index" open = "(" separator= "," close=")" >
+				#{item}
+			</foreach>
+		</if>
+		and mx.feestatus = 1
+		and sqd.stayhospitalmode = 2
+	</select>
+
+	<select id="queryMzZyCode" parameterType="map" resultType="java.lang.Integer">
+		select stayhospitalmode as MZZYCODE from l_lis_sqd
+		<where>
+			<if test="RequestId == null">
+				doctrequestno = #{LabBarcode.LabRequest[0].RequestId}
+			</if>
+			<if test="RequestId != null and RequestId != ''">
+				doctrequestno = #{RequestId}
+			</if>
+		</where>
+	</select>
+
+	<insert id="addLabBarcodeCreate" parameterType="map">
+		insert into
+		l_jytmxx(TMXH,JZXH,DOCTADVISENO,SAMPLESTATUS,REQUESTER,REQUESTTIME,
+		SECTION,BED_NO,STAYHOSPITALMODE,BRXZ,PATIENTID,FPHM,PATIENTNAME,SEX,
+		BIRTHDAY,AGE,AGE_UNIT,EXAMINAIM,EXAMINAIMCODE,FEE,FEESTATUS,
+		PRINTTIME,PRINTER,DIAGNOSTIC,DOCTREQUESTNO,REQUESTMODE,BRID,SFZH,
+		LXDH,ZDXH,BRBQ,SAMPLENO)
+		VALUES
+		(#{TMXH,jdbcType=NUMERIC},#{JZXH,jdbcType=NUMERIC},#{DOCTADVISENO,jdbcType=VARCHAR},#{SAMPLESTATUS,jdbcType=NUMERIC},#{REQUESTER,jdbcType=VARCHAR},#{REQUESTTIME},
+		#{SECTION,jdbcType=VARCHAR},#{BED_NO,jdbcType=VARCHAR},#{STAYHOSPITALMODE,jdbcType=NUMERIC},#{BRXZ,jdbcType=VARCHAR},#{PATIENTID,jdbcType=VARCHAR},#{FPHM,jdbcType=VARCHAR},#{PATIENTNAME,jdbcType=VARCHAR},#{SEX,jdbcType=VARCHAR},
+		#{BIRTHDAY,jdbcType=DATE},#{AGE,jdbcType=VARCHAR},#{AGE_UNIT,jdbcType=VARCHAR},#{EXAMINAIM,jdbcType=VARCHAR},#{EXAMINAIMCODE,jdbcType=VARCHAR},#{FEE,jdbcType=NUMERIC},#{FEESTATUS,jdbcType=NUMERIC},
+		TO_DATE(#{PRINTTIME},'yyyy-MM-dd HH24:mi:ss'),#{PRINTER,jdbcType=VARCHAR},#{DIAGNOSTIC,jdbcType=VARCHAR},#{DOCTREQUESTNO,jdbcType=VARCHAR},#{REQUESTMODE,jdbcType=NUMERIC},#{BRID,jdbcType=NUMERIC},#{SFZH,jdbcType=VARCHAR},
+		#{LXDH,jdbcType=VARCHAR},#{ZDXH,jdbcType=VARCHAR},#{BRBQ,jdbcType=VARCHAR},#{SAMPLENO,jdbcType=VARCHAR})
+	</insert>
+
+	<update id="updateSqdstatusCance" parameterType="java.util.Map">
+		update l_lis_sqd set sqdstatus = (case when stayhospitalmode = 2 then 2 else 3 end )
+		where doctrequestno = #{REQUESTID}
+	</update>
+
+	<!-- 取消申请单计费标志 -->
+	<update id="cancelOVBarCodeBillingMark" parameterType="map">
+		update l_lis_sqdmx
+		set zxpb = 0 , feestatus = 1
+		where DOCTREQUESTNO = #{REQUESTID}
+		and ylxh in
+		<foreach collection="FYXHS" item="item" index="index" open = "(" separator= "," close=")" >
+			#{item}
+		</foreach>
+		and feestatus = 2
+	</update>
+	<update id="cancelOVBarCodeBillingMarkNew" parameterType="map">
+		update l_lis_sqdmx
+		set zxpb = 0 , feestatus = 1
+		where DOCTREQUESTNO = #{REQUESTID}
+		and ylxh = #{YLXH}
+		and PREHYID = #{PREHYID}
+		and feestatus = 2
+	</update>
+
+	<update id="cancelBarCodeBillingMark" parameterType="map">
+		update l_lis_sqdmx
+		set feestatus = 1,zxpb = 0
+		where DOCTREQUESTNO = #{REQUESTID}
+		<if test="PREHYID != null">
+			and prehyid = #{PREHYID}
+		</if>
+		<if test="YLXH != null">
+			and YLXH = #{YLXH}
+		</if>
+		<!--
+		 and ylxh in
+		<foreach collection="FYXHS" item="item" index="index" open = "(" separator= "," close=")" >
+			#{item}
+		</foreach>-->
+		and feestatus = 2
+	</update>
+
+	<select id="queryIsRefundData" parameterType="map" resultType = "java.util.HashMap">
+		select tm.jzxh as ZYH, tmmx.ylxh as FYXH, tmmx.jlxh as YZXH,
+		tmmx.doctrequestno as REQUESTID , tmmx.YLXH as YLXH , tmmx.PREHYID as PREHYID , tmmx.YJXH as YJXH
+		from l_jytmxx_mx tmmx
+		join l_jytmxx tm on  tmmx.doctadviseno = tm.doctadviseno
+		<!-- join l_lis_sqd sqd on tmmx.doctrequestno = sqd.doctrequestno -->
+		where tmmx.doctadviseno = #{DOCTADVISENO}
+		and tmmx.feestatus = 2
+	</select>
+
+	<!-- 判断是门诊还是在住院 -->
+	<select id="queryCancelMzZyCode" parameterType="map" resultType = "java.util.HashMap">
+		select stayhospitalmode as MZZYCODE,doctrequestno as REQUESTID,jzxh as ZYH from l_jytmxx
+		where doctadviseno= #{DOCTADVISENO}
+	</select>
+
+	<update id="updateLJytmxxCollect" parameterType="map">
+		UPDATE L_JYTMXX
+		SET
+			EXECUTETIME = to_date(#{CollectDateTime},'yyyy-MM-dd HH24:mi:ss'),
+			EXECUTOR = #{CollectOperator}
+		WHERE DOCTADVISENO = #{BarcodeNo}
+	</update>
+
+	<insert id="insertLJytmxxBbzqCollect" parameterType="map">
+	INSERT INTO L_JYTMXX_BBZQ ( XH, DOCTADVISENO, STATUS,
+		EXECUTOR, EXECUTEDATE, SIGNER, KSDM, SJKS, SAMPLENO, TMXH )
+	select #{XH} as XH,DOCTADVISENO,'3' as STATUS,
+		#{CollectOperator} as EXECUTOR,TO_DATE(#{CollectDateTime},'yyyy-MM-dd HH24:mi:ss') as EXECUTEDATE,
+		'' as  SIGNER,section as KSDM,null as SJKS,null as SAMPLENO,
+		tmxh as TMXH from L_JYTMXX where DOCTADVISENO = #{BarcodeNo}
+	</insert>
+
+	<update id="updateLjytmxxCollectCancel" parameterType="map">
+		UPDATE L_JYTMXX SET EXECUTETIME = Null,
+		EXECUTOR = null, samplestatus=1 WHERE DOCTADVISENO = #{BARCODENO}
+	</update>
+
+	<update id="updateLabSampleSend" parameterType="map">
+		UPDATE L_JYTMXX SET samplestatus=4 WHERE DOCTADVISENO = #{DOCTADVISENO}
+	</update>
+
+	<update id="updateLabSampleSendCancel" parameterType="map">
+		UPDATE L_JYTMXX SET samplestatus = 1 WHERE DOCTADVISENO = #{DOCTADVISENO}
+	</update>
+
+	<update id="updateLJYTMXX" parameterType="map">
+		update l_jytmxx
+		Set
+			receiver = #{ReceiveOperator} ,
+			receivetime = to_date(#{ReceiveDateTime},'yyyy-MM-dd HH24:mi:ss'),
+			samplestatus =5 ,
+			sample_notes ='标本合格' ,
+			sampleno = #{SampleNo},
+			sample_jszt ='正常'
+		where doctadviseno =#{BarcodeNo}
+	</update>
+
+	<insert id="insertLJYTMXXBBZQ" parameterType="map">
+		INSERT INTO L_JYTMXX_BBZQ ( XH, DOCTADVISENO, STATUS,
+			EXECUTOR, EXECUTEDATE, SIGNER, KSDM, SJKS, SAMPLENO,
+			TMXH )
+		select #{XH} as XH,DOCTADVISENO, '10' as STATUS,
+		#{ReceiveOperator} as EXECUTOR,
+		TO_DATE(#{ReceiveDateTime},'yyyy-MM-dd HH24:mi:ss') as EXECUTEDATE, '' as  SIGNER,
+		labdepartment as KSDM, null as SJKS, null as SAMPLENO,
+		tmxh as TMXH
+		from L_JYTMXX where DOCTADVISENO = #{BarcodeNo}
+	</insert>
+
+	<update id="updateLjytmxx" parameterType="map">
+		update l_jytmxx
+		set
+			receiver =Null ,
+			receivetime =Null ,
+		 	executor =Null ,
+		 	executetime =Null ,
+		 	samplestatus = 2 ,
+		 	sample_notes ='标本不合格',
+		 	thjsr = #{OPERATOR}
+		where Doctadviseno = #{BARCODENO}
+	</update>
+
+	<update id="updateLtestresultAudit" parameterType="map">
+		update l_testresult  set teststatus= 4 where sampleno = (
+		select SAMPLENO from l_patientinfo
+		where doctadviseno = #{BarcodeNo} and SAMPLENO = #{SampleNo})
+	</update>
+
+	<update id="updateLjytmxxAudit" parameterType="map">
+		update l_jytmxx  set samplestatus= 6 where doctadviseno= #{BarcodeNo}
+	</update>
+
+	<update id="updateLpatientinfoAudit" parameterType="map">
+		update l_patientinfo  set resultstatus = 4 ,checkoperator = #{AuditDoctor},
+		checktime =  to_date(#{AuditDateTime},'yyyy-MM-dd HH24:mi:ss')
+		where doctadviseno= #{BarcodeNo} and SAMPLENO = #{SampleNo}
+	</update>
+
+    <update id="updateLpatientinfoCancel" parameterType="map">
+		update l_patientinfo set resultstatus = 3 ,checkoperator =Null,
+		checktime = Null
+		where doctadviseno = #{BarcodeNo}  and SAMPLENO = #{SampleNo}
+	</update>
+
+	<update id="updateLtestresultCancel" parameterType="map">
+		update l_testresult  set teststatus= 1 where sampleno = (
+		select SAMPLENO from l_patientinfo
+		where doctadviseno = #{BarcodeNo} and SAMPLENO = #{SampleNo} )
+	</update>
+
+	<select id="getLPatientInfo" parameterType="map" resultType="int">
+		select count(*) from l_patientinfo where doctadviseno = #{BarcodeNo} and SAMPLENO = #{SampleNo}
+	</select>
+
+	<select id="getLTestResult" parameterType="map" resultType="int">
+		select count(*) from l_testresult where sampleno = #{BarcodeNo}
+	</select>
+</mapper>

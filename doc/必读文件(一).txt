@@ -1,0 +1,26 @@
+**********程序必须启动eureka、tm、redis、elasticsearch（可选）***********************
+######TiDB 的数据迁移、全量备份和 MariaDB/MySQL binlog 增量同步
+system-api-eureka{
+    微服务注册中心（必须启动）
+}
+system-api-framework{
+    简单工具类
+}
+system-api-platform
+{  //此程序不需要eureka、tm、redis, 可单独启动
+    1、广安市人民医院DRGS上传
+    2、达州市人民医院DRGS上传
+}
+system-api-service{
+    定义的HIS、LIS接口用于feign
+}
+system-api-his-service-impl{
+    1、省骨科检查、输血
+}
+system-api-lis-service-impl{
+    1、省骨科检验、
+}
+system-platform
+{
+    计划图像界面
+}

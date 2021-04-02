@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.his.shengguke.ITransfusionReturnBillMapper">
+
+
+    <select id="getFYSL" parameterType="map" resultType="map">
+        select fysl as FYSL from zy_fymx where jlxh = #{chargeseq}
+    </select>
+
+    <insert id="insertZYFymx" parameterType="map">
+    insert into ZY_FYMX(
+        JLXH, JGID, ZYH, FYRQ, FYXH, FYMC, YPCD, FYSL, FYDJ, ZJJE, ZFJE, YSGH, SRGH,
+        QRGH, FYBQ, FYKS, ZXKS, JFRQ, XMLX, YPLX, FYXM, JSCS, ZFBL, YZXH, HZRQ, YJRQ,
+        ZLJE, ZLXZ, YEPB, DZBL, YBSC, GLJLXH, DZLB, EXPORTTIMES, CONFIRMID, CONFIRMDATE,
+        UNCONFIRMID, UNCONFIRMDATE,
+        YTSL, TFGL, ZTBH, ZTSFXM, SXSQDH, XMLXGLJLXH, BRBQ)
+        select #{jlxh},JGID, ZYH, FYRQ, FYXH, FYMC, YPCD, #{order_rtnqty}, FYDJ, #{order_rtnqty} * FYDJ, #{order_rtnqty} * FYDJ, YSGH, #{order_operPerson},
+        #{order_operPerson}, FYBQ, FYKS, ZXKS, sysdate, XMLX, YPLX, FYXM, JSCS, ZFBL, YZXH, HZRQ, YJRQ,
+        ZLJE, ZLXZ, YEPB, DZBL, YBSC, GLJLXH, DZLB, EXPORTTIMES, CONFIRMID, CONFIRMDATE,
+        UNCONFIRMID, UNCONFIRMDATE,
+        YTSL, TFGL, ZTBH, ZTSFXM, SXSQDH, XMLXGLJLXH, BRBQ
+        from zy_fymx where jlxh = #{chargeseq}
+    </insert>
+
+
+</mapper>

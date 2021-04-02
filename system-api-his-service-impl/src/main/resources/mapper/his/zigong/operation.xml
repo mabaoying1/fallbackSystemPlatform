@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--手术接口相关 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.his.zigong.OperationMapper">
+
+	<update id="updateArrangeWC" parameterType="java.util.Map">
+		update SM_SSAP set SM_SSAP.WCBZ  = #{wcbz}  where SM_SSAP.sqdh = #{RequestId}
+	</update>
+	<!-- 以下手术完成通知SQL -->
+	<insert id="insertOperationReCordOld" parameterType="java.util.Map">
+	 insert into sm_ssjl
+	 	(ssbh,jgid,kssj,jssj,ssfj,zyh,OperationSiteType,OptPatientType,Daysurgery)
+	 values
+		(#{SSBH},1,#{KSSJ},#{JSSJ},#{SSFJ},#{ZYH},#{OperationSiteType},#{OptPatientType},#{Daysurgery})
+	</insert>
+
+	<update id="updateArrangeSSMZ" parameterType="java.util.Map">
+		update SM_SSAP set SM_SSAP.WCBZ = #{wcbz}, SM_SSAP.MZWCBZ =#{mzbz} where SM_SSAP.sqdh= #{RequestId}
+	</update>
+
+	<select id="queryOpertionWCjlByRequestId" parameterType="java.util.Map" resultType="java.util.HashMap">
+		select a.SSBH,a.ZYH,KSSJ,JSSJ from SM_SSJL a inner join  SM_SSap b on a.ssbh = b.ssbh where ZFBZ=0
+		and b.sqdh = #{RequestId}
+	</select>
+
+	<select id="queryOpertionRecordByRequestId" parameterType="java.util.Map" resultType="java.util.HashMap">
+		select top  1 ZYH, SSBH from SM_SSAP where SQDH = #{RequestId} and ZFBZ = 0
+	</select>
+
+	<!-- 以下手术取消安排SQL -->
+	<update id="updateArrangeBZ" parameterType="java.util.Map">
+		update SM_SSAP set SM_SSAP.zfbz = #{zfbz} where SM_SSAP.sqdh = #{RequestId}
+	</update>
+
+	<update id="updateArrange" parameterType="java.util.Map">
+		update sm_sssq set sm_sssq.apbz = #{apbz} where sm_sssq.sqdh = #{RequestId}
+	</update>
+
+
+	<!-- 以下是手术安排功能SQL -->
+    <select id="querySMSSAPInfo" parameterType="map" resultType="map">
+        select SSBH, JGID,
+		SSKS, SQDH,
+		ZYH, APRQ  from SM_SSAP where sqdh = #{RequestId} and ZFBZ = 0
+    </select>
+
+    <select id="queryZYH" parameterType="java.util.Map" resultType="java.util.Map">
+        select ZYH, MZDM as "anesthesiaWayCode", SSNM as "operationCode" from sm_sssq
+        where sqdh = {RequestId}
+	</select>
+
+
+
+    <insert id="addArrange" parameterType="java.util.HashMap">
+		INSERT INTO SM_SSAP
+		(SSBH, JGID, SSKS, SQDH, ZYH, APRQ,
+		 SSRQ, SSNM, SSFJ, SSTH,
+		 SSYS, SSYZ, SSEZ, SSSZ,
+		 XSHS, XSHS_2, XHHS, XHHS_2,
+		 MZDM, MZYS, JZBZ, HZBZ,
+		 THBZ, MZBZ, QXBZ, SSBZ,
+		 JFBZ, ZFBZ, WCBZ, SHBZ,
+		MZWCBZ)
+		VALUES
+		(
+		#{DQZ}, 1, #{OperationDept}, #{RequestId}, #{ZYH}, sysdate,
+		#{OperationDateTime}, #{OPERATION}, #{OperationRoomNo}, #{OperationCounts},
+		#{Operator},#{Assistant1},#{Assistant2},#{Assistant3},
+		#{InstrumentNurse1},#{InstrumentNurse2},#{CirculatingNurse1},#{CirculatingNurse2},
+		#{AnesthesiaWayCode}, #{AnesthesiaDoctor}, #{JZBZ}, 0,
+		0, 0, 0, 0,
+		0, 0, #{WCBZ}, 0,
+		#{MZWCBZ})
+	</insert>
+
+	<select id="queryStatus" parameterType="java.util.Map" resultType="java.util.Map">
+      	select ZFBZ , APBZ from sm_ssap where sqdh = #{RequestId}
+    </select>
+</mapper>

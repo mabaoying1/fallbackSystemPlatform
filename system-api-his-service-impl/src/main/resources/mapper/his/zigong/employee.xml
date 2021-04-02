@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.his.zigong.EmployeeMapper">
+    <insert id="insertEmployee" parameterType="map">
+        insert into ms_brda (
+            YGDM , YGBH, YGXM, PYDM,
+            YGXB, CSNY, JGID, KSDM,
+            KCFQ, MZYQ, JSYQ, ZJPB,
+            ZJFY, ZFPB
+        )values(
+            #{PersonCode},#{PersonCode},#{PersonName},#{SpellCode},
+            #{Gender},#{Birthday},1,#{OfficeCode},
+            'N','N','N',0,
+            0,0
+        )
+    </insert>
+
+    <update id="updateEmployee" parameterType="map">
+        update ms_brda
+        <set>
+            <!-- <if test=" PersonCode != null and PersonCode != '' ">
+                YGDM = #{PersonCode} , YGBH = #{PersonCode},
+            </if>-->
+            <if test=" PersonName != null and  PersonName != '' ">
+                YGXM = #{PersonName},
+            </if>
+            <if test=" SpellCode != null and  SpellCode != '' ">
+                SpellCode = #{SpellCode},
+            </if>
+            <if test=" Gender != null and  Gender != '' ">
+                YGXB = #{Gender},
+            </if>
+            <if test=" Birthday != null and  Birthday != '' ">
+                CSNY = #{Birthday},
+            </if>
+            <if test=" OfficeCode != null and  OfficeCode != '' ">
+                KSDM = #{OfficeCode},
+            </if>
+        </set>
+        WHERE YGDM = #{PersonCode}
+    </update>
+</mapper>

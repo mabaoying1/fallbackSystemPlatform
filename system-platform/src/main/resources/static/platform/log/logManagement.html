@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all">
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+<form class="layui-form" action="" lay-filter="example">
+    <div class="demoTable" id="div_tyl">
+        方法名：
+        <div class="layui-inline" style="margin-top: 5px">
+            <input class="layui-input" name="methodName" id="methodName" autocomplete="off">
+        </div>
+        入参：
+        <div class="layui-inline" style="margin-top: 5px">
+            <input class="layui-input" name="InParameter" id="InParameter" autocomplete="off">
+        </div>
+        出参：
+        <div class="layui-inline" style="margin-top: 5px">
+            <input class="layui-input" name="OutParameter" id="OutParameter" autocomplete="off">
+        </div>
+        <div class="layui-inline" style="margin-top: 5px">
+            <label class="layui-form-label">开始日期</label>
+            <div class="layui-input-inline">
+                <input type="text" name="startDate" id="startDate" lay-verify="date" placeholder="yyyy-MM-dd"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline" style="margin-top: 5px">
+            <label class="layui-form-label">结束日期</label>
+            <div class="layui-input-inline">
+                <input type="text" name="endDate" id="endDate" lay-verify="date" placeholder="yyyy-MM-dd"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <button class="layui-btn" data-type="reload" id="LAY_layedit_code">搜索</button>
+    </div>
+    <table class="layui-hide" id="table_tyl">
+    </table>
+</form>
+
+
+<script src="../../layui/layui.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+
+<script>
+    layui.use(['table'],function () {
+
+        var table = layui.table;
+        table.render({
+            elem: '#table_tyl'
+            , url: '/queryLog'
+            , page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+                layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
+                //,curr: 5 //设定初始在第 5 页
+                , groups: 1 //只显示 1 个连续页码
+                , first: false //不显示首页
+                , last: false //不显示尾页
+
+            },
+            where:{
+                methodName: layui.$("#methodName").val(),
+                InParameter:layui.$("#InParameter").val(),
+                OutParameter:layui.$("#OutParameter").val(),
+                startDate:layui.$("#startDate").val(),
+                endDate:layui.$("#endDate").val()
+            }
+
+            , cols: [[
+                // {field: 'id', title: 'id',width: 200,hide:true }
+                //,
+                {field: 'methodName', title: '方法名', width: 200}
+                , {field: 'InParameterDateTime', width: 175, title: '入参调用时间'}
+                , {
+                    field: 'InParameter', width: 300, title: '入参',
+                    templet: function (res) {
+                        return '<span>' + JSON.stringify(res.InParameter) + '</span>';
+                    }
+                }
+                , {field: 'OutParameterDateTime', width: 175, title: '出参返回时间', sort: true}
+                , {
+                    field: 'OutParameter', width: 300, title: '出参', sort: true,
+                    templet: function (res) {
+                        return '<span>' + JSON.stringify(res.OutParameter) + '</span>';
+                    }
+                }
+
+            ]]
+
+        });
+    });
+    layui.use(['form'], function () {
+
+        //表单取值
+        layui.$('#LAY_layedit_code').on('click', function () {
+            var table = layui.table;
+            table.render({
+                elem: '#table_tyl'
+                , url: '/queryLog'
+                , page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+                    layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
+                    //,curr: 5 //设定初始在第 5 页
+                    , groups: 1 //只显示 1 个连续页码
+                    , first: false //不显示首页
+                    , last: false //不显示尾页
+
+                },
+                where:{
+                    methodName: layui.$("#methodName").val(),
+                    InParameter:layui.$("#InParameter").val(),
+                    OutParameter:layui.$("#OutParameter").val(),
+                    startDate:layui.$("#startDate").val(),
+                    endDate:layui.$("#endDate").val()
+                }
+
+                , cols: [[
+                    // {field: 'id', title: 'id',width: 200,hide:true }
+                    //,
+                    {field: 'methodName', title: '方法名', width: 200}
+                    , {field: 'InParameterDateTime', width: 175, title: '入参调用时间'}
+                    , {
+                        field: 'InParameter', width: 300, title: '入参',
+                        templet: function (res) {
+                            return '<span>' + JSON.stringify(res.InParameter) + '</span>';
+                        }
+                    }
+                    , {field: 'OutParameterDateTime', width: 175, title: '出参返回时间', sort: true}
+                    , {
+                        field: 'OutParameter', width: 300, title: '出参', sort: true,
+                        templet: function (res) {
+                            return '<span>' + JSON.stringify(res.OutParameter) + '</span>';
+                        }
+                    }
+
+                ]]
+
+            });
+
+        });
+
+    });
+</script>
+
+</body>
+</html>

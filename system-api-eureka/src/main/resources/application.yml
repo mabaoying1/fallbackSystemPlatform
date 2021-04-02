@@ -1,0 +1,23 @@
+###eureka 服务端口号
+server:
+  port: 8100
+###服务注册名称
+eureka:
+  instance:
+    hostname: server1
+###客户端调用地址 http://admin:admin@${eureka.instance.hostname}:${server.port}/eureka/
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+###因为该应用为注册中心，不会注册自己
+    register-with-eureka: false
+###因为自己为注册中心 ,不会去在该应用中的检测服务
+    fetch-registry: false
+
+#spring:
+#  security:
+#    basic:
+#      enabled: true
+#    user:
+#      password: admin
+#      name: admin

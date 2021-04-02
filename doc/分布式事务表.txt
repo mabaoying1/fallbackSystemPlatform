@@ -1,0 +1,26 @@
+--TM程序需要这两个表支持--
+create table T_LOGGER(
+      id          VARCHAR2(64) not null,
+      group_id    VARCHAR2(64) not null,
+      unit_id     VARCHAR2(32) not null,
+      tag         VARCHAR2(50) not null,
+      content     VARCHAR2(1024) not null,
+      create_time VARCHAR2(30) not null,
+      app_name    VARCHAR2(128) not null
+);
+ALTER TABLE T_LOGGER ADD CONSTRAINT pk_id PRIMARY key(id);
+
+
+create table T_TX_EXCEPTION
+(
+  id                NUMBER(19) not null,
+  create_time       TIMESTAMP(6),
+  ex_state          NUMBER(5) not null,
+  group_id          VARCHAR2(60 CHAR),
+  mod_id            VARCHAR2(100 CHAR),
+  registrar         NUMBER(5) not null,
+  remark            VARCHAR2(255 CHAR),
+  transaction_state NUMBER(10),
+  unit_id           VARCHAR2(60 CHAR)
+);
+ALTER TABLE T_TX_EXCEPTION ADD CONSTRAINT pk_id PRIMARY key(id);

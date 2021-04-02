@@ -1,0 +1,177 @@
+<html>
+<head>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <link rel="stylesheet" href="layui/owncss/login.css">
+    <link href="layui/login/css/font-awesome.css" rel="stylesheet" />
+
+    <link href="layui/login/css/normalize.css" rel="stylesheet" />
+    <link href="layui/login/css/demo.css" rel="stylesheet" />
+    <link href="layui/login/css/component.css" rel="stylesheet" />
+    <script type="text/javascript">
+        //解决iframe下系统超时无法跳出iframe框架的问题
+        if (window != top)
+            top.location.href = location.href;
+    </script>
+    <script src="layui/layui.js"></script>
+
+    <style>
+        canvas {
+            position: absolute;
+            z-index: -1;
+        }
+
+        .kit-login-box header h1 {
+            line-height: normal;
+        }
+
+        .kit-login-box header {
+            height: auto;
+        }
+
+        .content {
+            position: relative;
+        }
+
+        .codrops-demos {
+            position: absolute;
+            bottom: 0;
+            left: 40%;
+            z-index: 10;
+        }
+
+        .codrops-demos a {
+            border: 2px solid rgba(242, 242, 242, 0.41);
+            color: rgba(255, 255, 255, 0.51);
+        }
+
+        .kit-pull-right button,
+        .kit-login-main .layui-form-item input {
+            background-color: transparent;
+            color: white;
+        }
+
+        .kit-login-main .layui-form-item input::-webkit-input-placeholder {
+            color: white;
+        }
+
+        .kit-login-main .layui-form-item input:-moz-placeholder {
+            color: white;
+        }
+
+        .kit-login-main .layui-form-item input::-moz-placeholder {
+            color: white;
+        }
+
+        .kit-login-main .layui-form-item input:-ms-input-placeholder {
+            color: white;
+        }
+
+        .kit-pull-right button:hover {
+            border-color: #009688;
+            color: #009688
+        }
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>登录界面</title>
+</head>
+<body>
+
+<body class="kit-login-bg">
+<div class="container demo-1">
+    <div class="content">
+        <div id="large-header" class="large-header">
+            <canvas id="demo-canvas"></canvas>
+            <div class="kit-login-box" style="height: 330px;">
+                <header>
+                    <h1>用户登录</h1>
+                </header>
+                <div class="kit-login-main">
+                    <form action="" class="layui-form" method="post">
+                        <div class="layui-form-item">
+                            <label class="kit-login-icon">
+                                <i class="layui-icon">&#xe612;</i>
+                            </label>
+                            <input type="text" name="userName" id="userName" lay-verify="required" autocomplete="off" placeholder="这里输入用户名." class="layui-input">
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="kit-login-icon">
+                                <i class="layui-icon">&#xe642;</i>
+                            </label>
+                            <input type="password" name="password" id="password" lay-verify="required" autocomplete="off" placeholder="这里输入密码." class="layui-input">
+                        </div>
+                        <!-- <div class="layui-form-item">
+                            <label class="kit-login-icon">
+                                <i class="layui-icon">&#xe642;</i>
+                            </label>
+                            <input type="number" name="validCode" lay-verify="required|number" autocomplete="off" placeholder="输入右侧计算结果." class="layui-input">
+                            <span class="form-code" id="changeCode" style="position:absolute;right:2px; top:2px;">
+                                <img src="" id="refImg" style="cursor:pointer;" title="点击刷新"/>
+                            </span>
+                        </div> -->
+
+                    </form>
+                    <div class="layui-form-item">
+                        <div class="layui-form kit-pull-left kit-login-remember">
+                            <input type="checkbox" name="rememberMe" value="true" lay-skin="primary" checked title="记住帐号?">
+                        </div>
+                        <div class="kit-pull-right">
+                            <button class="layui-btn layui-btn-primary" data-type="login">
+                                登录
+                            </button>
+                        </div>
+                        <div class="kit-clear"></div>
+                    </div>
+                </div>
+                <footer>
+                    <p>bsoft © <a href="http://www.bsoft.com.cn/" style="color:white; font-size:18px;" target="_blank">www.bsoft.com.cn</a></p>
+                </footer>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="layui/layui.js"></script>
+
+<script src="layui/login/js/TweenLite.min.js"></script>
+<script src="layui/login/js/EasePack.min.js"></script>
+<script src="layui/login/js/rAF.js"></script>
+<script src="layui/login/js/demo-1.js"></script>
+
+
+
+<script>
+    layui.use(['form',  'jquery'], function(){
+        var form = layui.form
+            ,layer = layui.layer
+        ;
+        //,$ = layui.$
+
+        var $ = layui.$, active = {
+            login : function(){
+                // $.ajax({ type: 'POST', dataType: "json",
+                //     url: "<%=request.getContextPath() %>/mp/login/loginValidate" ,
+                //     data: {"USER_NAME" : $("#userName").val() , "PASSWORD" : $("#password").val()} ,
+                //     success: function(json){
+                //         if(json.success == true){
+                //             //layer.msg('登录成功',{icon: 2});
+                //             window.location.href = "<%=request.getContextPath() %>/mp/login/index";
+                //         }
+                //         else{
+                //             //JSON.stringify(data.field)
+                //             layer.msg(json.msg,{icon: 2});
+                //         }
+                //     }
+                // });
+            }
+        };
+
+        $('.kit-pull-right .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+
+
+</script>
+</body>
+</html>

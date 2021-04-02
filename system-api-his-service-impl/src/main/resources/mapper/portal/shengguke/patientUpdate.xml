@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.portal.shengguke.IPatientUpdateImplMapper">
+
+	<update id="updateGYBrda" parameterType="map">
+		update gy_brda
+		set
+		jdr = #{jdr,jdbcType=VARCHAR} ,
+		jdsj = to_date(#{SystemTime},'yyyy-MM-dd hh24:mi:ss'),
+		jdjg = #{JGID},
+		brxm = #{Name},
+		brxz = #{BRXZ},
+		brxb = #{Sex},
+		csny = TO_DATE(#{BirthDate},'yyyy-mm-dd hh24:mi:ss'),
+		xgsj = sysdate,
+		hkdz = #{Address,jdbcType=VARCHAR},
+		jtdh = #{PatientPhone,jdbcType=VARCHAR},
+		jhrm = #{ContactPerson,jdbcType=VARCHAR}
+		where sfzh = #{IdCard} and ZXBZ = 0
+	</update>
+
+</mapper>

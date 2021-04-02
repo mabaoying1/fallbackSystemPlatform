@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+
+<mapper namespace="com.soft.api.mapper.his.SC.InhospitalFillUpFeeMapper">
+
+    <select id="getFydj" parameterType="map" resultType="map">
+        select FYDJ,FYMC from GY_YLML l left join GY_YLMX x on l.fyxh = x.fyxh  where l.fyxh = #{fyxh}
+    </select>
+
+    <select id="getZYH" parameterType="map" resultType="map">
+        select ZYH from zy_brry where zyhm = #{zyhm}
+    </select>
+
+    <insert id="insertZyFymx" parameterType="map">
+        insert into zy_fymx (
+            JLXH, JGID, ZYH, FYRQ, FYXH,
+            FYMC, YPCD, FYSL, FYDJ, ZJJE,
+            ZFJE, YSGH, SRGH, QRGH, FYBQ,
+            FYKS, ZXKS, JFRQ,  XMLX, YPLX,
+            FYXM, JSCS, ZFBL,
+            YZXH, YEPB
+        ) values(
+            #{jlxh} , 1 , #{zyh} , ${fyrq}, #{fyxh},
+            #{fymc} , 0 , #{fysl}, #{fydj}, #{zjje},
+            #{zjje}, #{ysgh}, #{srgh}, #{qrgh}, #{fybq},
+            #{fyks}, #{zxks}, ${fyrq},  #{xmlx}, #{yplx},
+            (select fygb from GY_YLML where fyxh = #{fyxh}), 0, 1,
+            (SELECT top 1 JLXH FROM ZY_BQYZ WHERE YJXH= #{yjxh}), #{yepb}
+        )
+    </insert>
+</mapper>

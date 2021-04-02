@@ -1,0 +1,5 @@
+<root>
+    <OperationRecordNo>手术记录序号</OperationRecordNo>
+    <OperationDoctorCode>手术医师编码</OperationDoctorCode>
+    <OperationDoctorName>手术医师姓名</OperationDoctorName>
+</root>

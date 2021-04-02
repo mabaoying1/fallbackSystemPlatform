@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+<mapper namespace="com.soft.api.mapper.his.shengguke.ITransfusionDoctorAdviceMapper">
+
+    <select id="getPatientInfo" parameterType="map" resultType="map">
+        select BRCH, ZYH from zy_brry where zyhm = #{outpatient_id}
+    </select>
+
+    <insert id="insertEmrYzb" parameterType="map">
+        INSERT INTO EMR_YZB(
+        YZBXH,BRID,ZYH,
+        BRKS,
+        BRBQ,
+        BRCH,YDYZLB,XMLB,XMID,YZZH,
+        YZQX,YYSX,
+        KZKS,
+        KZYS,KZSJ,YZMC,YPCD,FYSX,SYPC,GYTJ,
+        YCJL,ZL,JJYZ,BLYZ,TZSJ,TZYS,YZZT,ZXZT,KZDY,ZTBZ,
+        SQDH,YZPLZH,PLSX)
+        VALUES (
+        #{yzbxh},0,#{outpatient_id},
+        (select max(ksdm) from gy_ksdm where ptksdm = #{patient_dept} and zysy = 'Y'),
+        (select max(ksdm) from gy_ksdm where ptksdm = #{patient_ward} and bqsy = 'Y'),
+        #{brch}, #{order_type}, 2, 0,#{yzzh},
+        2,2,
+        (select max(ksdm) from gy_ksdm where ptksdm = #{patient_dept} and zysy = 'Y'),
+        #{order_operperson},to_date(#{order_operdate},'yyyy-mm-dd hh24:mi:ss'),#{order_itemtext},0,0,'st',0,
+        1,#{order_itemcount},0,0,to_date(#{order_operdate},'yyyy-mm-dd hh24:mi:ss'),#{order_operperson},1,0,0,0,
+        #{apply_no},#{yzzh},1
+        )
+    </insert>
+
+    <insert id="insertEmrYzbczrz" parameterType="map">
+        INSERT INTO emr_yzbczrz(CZXH,YZBXH,CZSJ,CZJS,CZGH,CZLX,QZZT,HZZT,WTMS)
+        VALUES(#{yzbczrz},#{yzbxh},SYSDATE,1,#{order_operperson},1,0,1,'新开')
+    </insert>
+    
+</mapper>

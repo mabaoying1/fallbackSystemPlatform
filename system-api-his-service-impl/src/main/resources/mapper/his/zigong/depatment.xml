@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+
+<mapper namespace="com.soft.api.mapper.his.zigong.DepatmentMapper">
+
+	<insert id="insertDepatment" parameterType="map">
+		insert into GY_KSDM(
+			KSDM , JGID, KSMC, PYDM, SJKS,
+			MZSY,  YJSY, ZYSY, BQSY, EDCW
+		)values(
+			#{OfficeCode},1,#{OfficeName},#{SpellCode},#{ParentId},
+			'N', 'N', 'N', 'N',0
+		)
+		<!--insert into GY_KSDM (
+			KSDM , KSMC, FLKSDM, MJPB,
+			SRM1,  JGID
+		)values(
+			#{OfficeCode}, #{OfficeName}, #{ParentId}, 0,
+			#{SpellCode},  1
+		) -->
+	</insert>
+
+	<update id="updateDepatment" parameterType="map">
+		update GY_KSDM
+		<set>
+			<if test=" OfficeName != null and OfficeName != ''">KSMC = #{OfficeName},</if>
+			<if test=" ParentId != null and  ParentId != ''">SJKS = #{ParentId},</if>
+			<if test=" SpellCode != null and  SpellCode != ''">PYDM = #{SpellCode},</if>
+		</set>
+		where KSDM = #{OfficeCode}
+
+
+		<!--update GY_KSDM
+		<set>
+			<if test=" OfficeName != null and OfficeName != ''">KSMC = #{OfficeName},</if>
+			<if test=" ParentId != null and  ParentId != ''">FLKSDM = #{ParentId},</if>
+			<if test=" SpellCode != null and  SpellCode != ''">SRM1 = #{SpellCode},</if>
+		</set>
+		where KSDM = #{OfficeCode} -->
+	</update>
+
+</mapper>

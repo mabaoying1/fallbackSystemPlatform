@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+
+<mapper namespace="com.soft.api.mapper.his.SC.QueryInhospitalInfoMapper">
+
+    <select id="queryInhospitalInfo" parameterType="map" resultType="map">
+		select t2.BRID,
+		t2.BRXM,
+		case t2.brxb when 1 then '男'  when 2 then '女'  else '未知'  end as BRXB,
+		t2.BRXZ,
+		t1.JZKH,
+		t2.ZYHM,
+		t2.brks as RYKSDM,
+		(select top 1  brks
+		from zy_rcjl
+		where zyh = t2.zyh
+		and czlx = '-1'
+		) as CYKSDM,
+		t2.RYRQ,
+		t2.CYRQ,
+		(select ksmc from gy_ksdm where ksdm = t2.brks) as RYKS,
+		(select ksmc
+		from gy_ksdm
+		where ksdm = (select top 1 brks
+		from zy_rcjl
+		where zyh = t2.zyh
+		and czlx = '-1'
+		)) as CYKS,
+		(select top 1 jbmc from ys_zy_jbzd zd where zd.jzhm = t2.zyh and zdlb = '入院诊断' ) as RYZD,
+		(select top 1 jbmc from ys_zy_jbzd zd where zd.jzhm = t2.zyh and zdlb = '出院诊断' ) as CYZD,
+		t3.ZYCS,
+		t2.BRCH
+		from ms_brda t1, zy_brry t2, YS_ZY_JZJL t3
+		where t1.brid = t2.brid and t2.ZYH=t3.JZHM
+	 	 <if test="brid != null and brid != ''">
+                and t2.brid = #{brid}
+            </if>
+            <if test="zyhm != null and zyhm != ''">
+                and t2.zyhm = #{zyhm}
+            </if>
+            <if test="sfzh != null and sfzh != ''">
+                and t2.sfzh = #{sfzh}
+         </if>
+	 
+    </select>
+
+</mapper>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 映射文件，映射到对应的SQL接口 -->
+
+<mapper namespace="com.soft.api.mapper.his.SC.InhospitalCancelFillUpFeeMapper">
+
+    <select id="getFydj" parameterType="map" resultType="map">
+        select FYDJ,FYMC from GY_YLML l left join GY_YLMX x on l.fyxh = x.fyxh  where l.fyxh = #{fyxh}
+    </select>
+
+    <select id="getZYH" parameterType="map" resultType="map">
+        select ZYH from zy_brry where zyhm = #{zyhm}
+    </select>
+
+    <select id="queryZyFymx" parameterType="map" resultType="map">
+        select
+        t.ZYH, t.FYXH as "fyxh",
+        t.FYMC as "fymc", t.YPCD as "ypcd", t.FYSL as "fysl", t.FYDJ as "fydj", t.ZJJE as "zjje",
+        t.FYBQ as "fybq",
+        t.FYKS as "fyks" , t.ZXKS as "zxks", t.XMLX as "xmlx", t.YPLX as "yplx",
+        t.FYXM as "fyxm", t.JSCS as "jscs", t.ZFBL as "zfbl", t.YZXH as "yzxh", t.YEPB as "yepb",
+        t.TFSL as "tfsl" , t.TFJE as "tfje"
+        from zy_fymx t where t.jlxh = #{jlxh} and zyh = #{ZYH}
+    </select>
+
+    <update id="updateZyFymx" parameterType="map">
+        update zy_fymx set TFSL = #{tfsl} , TFJE = #{tfje} where JLXH = #{jlxh}
+    </update>
+
+    <insert id="insertZyFymx" parameterType="map">
+        insert into zy_fymx (
+            JLXH, JGID, ZYH, FYRQ, FYXH,
+            FYMC, YPCD, FYSL, FYDJ, ZJJE,
+            ZFJE, YSGH, SRGH, QRGH, FYBQ,
+            FYKS, ZXKS, JFRQ,   XMLX, YPLX,
+            FYXM, JSCS, ZFBL, YZXH, YEPB
+        ) values(
+            #{jlxh} , 1 , #{zyh} , ${fyrq}, #{fyxh},
+            #{fymc} , 0 , #{fysl}, #{fydj}, #{zjje},
+            #{zjje}, #{ysgh}, #{srgh}, #{qrgh}, #{fybq},
+            #{fyks}, #{zxks},  ${fyrq},  #{xmlx}, #{yplx},
+            #{fyxm}, 0, 1, #{yzxh}, #{yepb}
+        )
+    </insert>
+
+</mapper>

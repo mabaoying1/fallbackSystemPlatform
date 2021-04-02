@@ -1,0 +1,51 @@
+A方法没开启事务，B方法开启事务：A和B在同一类中，事务无效；A和B不在同一类中，事务生效。
+A方法开启事务，B方法没开启事务：A和B在同一类中，事务生效；A和B不在同一类中，事务生效。
+
+
+//设置手动回滚
+TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+@Transactional遇到的几个场景:
+@Transactional 加于private方法, 无效
+@Transactional 加于未加入接口的public方法, 再通过普通接口方法调用, 无效
+@Transactional 加于接口方法, 无论下面调用的是private或public方法, 都有效
+@Transactional 加于接口方法后, 被本类普通接口方法直接调用, 无效
+@Transactional 加于接口方法后, 被本类普通接口方法通过接口调用, 有效
+@Transactional 加于接口方法后, 被它类的接口方法调用, 有效
+@Transactional 加于接口方法后, 被它类的私有方法调用后, 有效
+/**********************************************************************/
+@Transactional 属性：
+Propagation.REQUIRED 如果当前存在事务，则加入该事务，如果当前不存在事务，则创建一个新的事务。
+Propagation.SUPPORTS 如果当前存在事务，则加入该事务；如果当前不存在事务，则以非事务的方式继续运行。
+Propagation.MANDATORY 如果当前存在事务，则加入该事务；如果当前不存在事务，则抛出异常。
+Propagation.REQUIRES_NEW 重新创建一个新的事务，如果当前存在事务，暂停当前的事务。
+Propagation.NOT_SUPPORTED 以非事务的方式运行，如果当前存在事务，暂停当前的事务。
+Propagation.NEVER 以非事务的方式运行，如果当前存在事务，则抛出异常。
+Propagation.NESTED 和 Propagation.REQUIRED 效果一样。
+//测试有效
+@Transactional(propagation = Propagation.REQUIRES_NEW)
+public long getMaxANDValide(String bmc , int count){}
+/**********************************************************************/
+
+/**********************************************************************/
+手动回滚事务
+方法上要加上 @Transactional(rollbackFor = Exception.class)
+再配合 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+才可以，否则会报错  NoTransactionException:
+No transaction aspect-managed TransactionStatus in scope
+/**********************************************************************/
+/**********************************************************************/
+本地没有测试成功
+前提,添加@Transactional
+TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+不提交本次事务
+Object o1 = TransactionAspectSupport.currentTransactionStatus().createSavepoint();
+创建一个保存点
+TransactionAspectSupport.currentTransactionStatus().rollbackToSavepoint(o1);
+提交保存点之前的事务,保存点之后的事务不去提交
+TransactionAspectSupport.currentTransactionStatus().releaseSavepoint(o1);
+释放保存点
+/**********************************************************************/
+/**********************************************************************/
+熔断配置
+DTXUserControls.rollbackGroup(TracingContext.tracing().groupId());
+/**********************************************************************/
