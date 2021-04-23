@@ -12,6 +12,51 @@ server:
 spring:
   application:
     name: app-soft-other
+  emr:
+    datasource:
+      type: com.alibaba.druid.pool.DruidDataSource
+      driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      url: jdbc:sqlserver://192.168.0.6:1433;DatabaseName=portal_emr
+      username: sa
+      password: bsoft
+      #      driverClassName: oracle.jdbc.driver.OracleDriver
+      #      url: jdbc:oracle:thin:@192.168.0.109:1521:orcl2
+      ##省骨科
+      #      url: jdbc:oracle:thin:@196.168.0.166:1521:his
+      #
+      #      username: his
+      #      password: HIS%1123
+      #      url: jdbc:oracle:thin:@192.168.0.109:1521:orcl2
+      #      username: his
+      #      password: his
+      # 初始连接数
+      initialSize: 5
+      # 最小连接池数量
+      minIdle: 10
+      # 最大连接池数量
+      maxActive: 200
+      # 配置获取连接等待超时的时间
+      maxWait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      minEvictableIdleTimeMillis: 300000
+      # 配置一个连接在池中最大生存的时间，单位是毫秒
+      maxEvictableIdleTimeMillis: 900000
+      # 配置检测连接是否有效
+      validationQuery: SELECT 1
+      #是否在连接空闲一段时间后检测其可用性
+      testWhileIdle: true
+      #是否在获得连接后检测其可用性
+      testOnBorrow: false
+      #是否在连接放回连接池后检测其可用性
+      testOnReturn: false
+      #超过时间限制是否回收
+      removeAbandoned: true
+      #超时时间；单位为秒。180秒=3分钟
+      removeAbandonedTimeout: 300
+      #关闭abanded连接时输出错误日志 正式环境一般关闭
+      logAbandoned: false
   his:
     datasource:
       type: com.alibaba.druid.pool.DruidDataSource
@@ -26,9 +71,9 @@ spring:
 #
 #      username: his
 #      password: HIS%1123
-      url: jdbc:oracle:thin:@118.126.110.229:1521:orcl
-      username: bsadmin
-      password: bsadmintencent
+      url: jdbc:oracle:thin:@192.168.0.109:1521:orcl2
+      username: his
+      password: his
       # 初始连接数
       initialSize: 5
       # 最小连接池数量
@@ -113,10 +158,10 @@ spring:
       driverClassName: oracle.jdbc.driver.OracleDriver
       #      url: jdbc:oracle:thin:@192.168.0.109:1521:orcl2
       ##省骨科
-      url: jdbc:oracle:thin:@196.168.0.166:1521:his
+      url: jdbc:oracle:thin:@192.168.0.109:1521:orcl2
       #      url: jdbc:oracle:thin:@118.126.110.229:1521:orcl
       username: zhlis
-      password: ZHLIS%1123
+      password: zhlis
       #      password: zhlis
       #      driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
       #      url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=test
@@ -147,6 +192,7 @@ spring:
       removeAbandonedTimeout: 300
       #关闭abanded连接时输出错误日志 正式环境一般关闭
       logAbandoned: false
+
   cloud:
     client:
       ipAddress: 127.0.0.1
@@ -226,10 +272,11 @@ logging:
           mapper: debug
       codingapi:
         txlcn: DEBUG
+
 ##################################################################
 system:
   #####0 不使用  1使用 [存放日志]
-  isElasticsearch: 1
+  isElasticsearch: 0
   ###elasticsearch的服务器地址
   elasticsearchHost: 127.0.0.1
   ####通过http请求的端口号是9200，通过客户端请求的端口号是9300

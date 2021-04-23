@@ -1,5 +1,6 @@
 package com.soft.dataSource;
 
+import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -32,4 +33,7 @@ public class LISDBConfig {
     private boolean testOnBorrow;
     private boolean testOnReturn;
 
+    private boolean removeAbandoned;
+    private int removeAbandonedTimeout;
+    private boolean logAbandoned;
 }

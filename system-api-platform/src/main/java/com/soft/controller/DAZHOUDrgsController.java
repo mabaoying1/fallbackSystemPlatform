@@ -173,19 +173,19 @@ public class DAZHOUDrgsController {
            Object DischargeOutcome = JSONObject.parseObject(leaveHospital.get(0).toString()).get("DischargeOutcome");
            Object HospitalizationSituation = JSONObject.parseObject(leaveHospital.get(0).toString()).get("HospitalizationSituation");
            byte[] bytes = decoder.decodeBuffer(HospitalizationSituation.toString());
-           HospitalizationSituation = new String(bytes,"gbk");
+           HospitalizationSituation = new String(bytes,"gbk").replaceAll("\"","");
 //           Clob cHospitalizationSituation = new SerialClob(HospitalizationSituation.toString().toCharArray());
            Object DtProcess = JSONObject.parseObject(leaveHospital.get(0).toString()).get("DtProcess");
            bytes = decoder.decodeBuffer(DtProcess.toString());
-           DtProcess = new String(bytes,"gbk");
+           DtProcess = new String(bytes,"gbk").replaceAll("\"","");
 //           Clob cDtProcess = new SerialClob(DtProcess.toString().toCharArray());
            Object LeaveHospitalStatus = JSONObject.parseObject(leaveHospital.get(0).toString()).get("LeaveHospitalStatus");
            bytes = decoder.decodeBuffer(LeaveHospitalStatus.toString());
-           LeaveHospitalStatus = new String(bytes,"gbk");
+           LeaveHospitalStatus = new String(bytes,"gbk").replaceAll("\"","");
 //           Clob cLeaveHospitalStatus = new SerialClob(LeaveHospitalStatus.toString().toCharArray());
            Object LeaveDoctorAdvice = JSONObject.parseObject(leaveHospital.get(0).toString()).get("LeaveDoctorAdvice");
            bytes = decoder.decodeBuffer(LeaveDoctorAdvice.toString());
-           LeaveDoctorAdvice = new String(bytes,"gbk");
+           LeaveDoctorAdvice = new String(bytes,"gbk").replaceAll("\"","");
 //           Clob cLeaveDoctorAdvice = new SerialClob(LeaveDoctorAdvice.toString().toCharArray());
            buffer.append(",\"LeaveHospital\":{\"DischargeOutcome\":\""+DischargeOutcome
                    +"\",\"HospitalizationSituation\":\""+ HospitalizationSituation

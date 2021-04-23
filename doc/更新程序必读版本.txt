@@ -21,3 +21,26 @@ system:
 1、查询费用项目（system-api-other-service-impl）
 2、住院补计费用（system-api-other-service-impl）
 3、住院作废补计费用（system-api-other-service-impl）
+
+
+2021-04-07
+处理bug. 配置druid : removeAbandoned、removeAbandonedTimeout、logAbandoned 未写入到DruidDataSource中
+在DBConfig中新增以下三行:
+    private boolean removeAbandoned;
+    private int removeAbandonedTimeout;
+    private boolean logAbandoned;
+在DataSourceConfig新增以下:
+    druid.setRemoveAbandoned(dbConfig.isRemoveAbandoned());
+    druid.setRemoveAbandonedTimeout(dbConfig.getRemoveAbandonedTimeout());
+    druid.setLogAbandoned(dbConfig.isLogAbandoned());
+	
+2021-04-15
+1、病历列表查询（system-api-other-service-impl）
+2、病历html查询（system-api-other-service-impl）
+3、获取病历文书的基础项目（system-api-other-service-impl）
+4、获取病历文书的结果（system-api-other-service-impl）
+
+
+
+
+

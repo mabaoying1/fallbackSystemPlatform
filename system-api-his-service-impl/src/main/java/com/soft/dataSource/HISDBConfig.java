@@ -32,4 +32,7 @@ public class HISDBConfig {
     private boolean testOnBorrow;
     private boolean testOnReturn;
 
+    private boolean removeAbandoned;
+    private int removeAbandonedTimeout;
+    private boolean logAbandoned;
 }

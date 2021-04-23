@@ -57,6 +57,11 @@ public class LISDataSourceConfig {
         //申请连接时执行validationQuery检测连接是否有效
         druid.setTestOnBorrow(dbConfig.isTestOnBorrow());
         druid.setTestOnReturn(dbConfig.isTestOnReturn());
+
+        druid.setRemoveAbandoned(dbConfig.isRemoveAbandoned());
+        druid.setRemoveAbandonedTimeout(dbConfig.getRemoveAbandonedTimeout());
+        druid.setLogAbandoned(dbConfig.isLogAbandoned());
+
         //是否缓存preparedStatement，也就是PSCache，oracle设为true，mysql设为false。分库分表较多推荐设置为false
 //        druid.setPoolPreparedStatements(poolPreparedStatements);
         // 打开PSCache时，指定每个连接上PSCache的大小
